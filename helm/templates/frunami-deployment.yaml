@@ -1,11 +1,11 @@
-{{- $d := .Values.frulab.docker }}
+{{- $d := .Values.frunami.docker }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "frulab.name" . }}
+  name: {{ include "frunami.name" . }}
   labels:
-    {{- include "frulab.labels" . | nindent 4 }}
-    app.kubernetes.io/name: frulab
+    {{- include "frunami.labels" . | nindent 4 }}
+    app.kubernetes.io/name: frunami
 spec:
   replicas: 1
   # bbolt allows one process on the database at a time
@@ -13,22 +13,22 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      {{- include "frulab.selector" . | nindent 6 }}
+      {{- include "frunami.selector" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "frulab.selector" . | nindent 8 }}
+        {{- include "frunami.selector" . | nindent 8 }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/frulab-secret.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/frunami-secret.yaml") . | sha256sum }}
     spec:
       containers:
-        - name: fru-lab
-          image: "{{ .Values.frulab.image.repository }}:{{ .Values.frulab.image.tag }}"
-          imagePullPolicy: {{ .Values.frulab.image.pullPolicy }}
-          command: ["./fru-lab", "-c", "config.yaml"]
+        - name: frunami
+          image: "{{ .Values.frunami.image.repository }}:{{ .Values.frunami.image.tag }}"
+          imagePullPolicy: {{ .Values.frunami.image.pullPolicy }}
+          command: ["./frunami", "-c", "config.yaml"]
           ports:
             - name: http
-              containerPort: {{ .Values.frulab.service.port }}
+              containerPort: {{ .Values.frunami.service.port }}
           readinessProbe:
             tcpSocket:
               port: http
@@ -40,26 +40,26 @@ spec:
             periodSeconds: 20
           volumeMounts:
             - name: config
-              mountPath: /frulab/config.yaml
+              mountPath: /frunami/config.yaml
               subPath: config.yaml
               readOnly: true
             - name: db
-              mountPath: /frulab/db
+              mountPath: /frunami/db
             {{- if $d.enabled }}
             - name: docker-sock
               mountPath: /var/run/docker.sock
             - name: deploy
               mountPath: {{ $d.workDir }}
             {{- end }}
-          {{- with .Values.frulab.resources }}
+          {{- with .Values.frunami.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
       volumes:
         - name: config
           secret:
-            secretName: {{ include "frulab.name" . }}-config
-        {{- include "frulab.volume" (dict "name" "db" "p" .Values.frulab.persistence "claim" (printf "%s-db" (include "frulab.name" .))) | nindent 8 }}
+            secretName: {{ include "frunami.name" . }}-config
+        {{- include "frunami.volume" (dict "name" "db" "p" .Values.frunami.persistence "claim" (printf "%s-db" (include "frunami.name" .))) | nindent 8 }}
         {{- if $d.enabled }}
         - name: docker-sock
           hostPath:
@@ -70,15 +70,15 @@ spec:
             path: {{ $d.workDir }}
             type: DirectoryOrCreate
         {{- end }}
-      {{- with .Values.frulab.nodeSelector }}
+      {{- with .Values.frunami.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.frulab.tolerations }}
+      {{- with .Values.frunami.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.frulab.affinity }}
+      {{- with .Values.frunami.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}

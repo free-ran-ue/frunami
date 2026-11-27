@@ -12,8 +12,8 @@ import (
 )
 
 // Throughput Tester profiles live in testerProfilesBucket, keyed by a
-// random ID so a profile can be renamed. fru-lab stores each profile
-// opaquely (fru-tester owns its schema and validation) and only reads its
+// random ID so a profile can be renamed. frunami stores each profile
+// opaquely (frunami-tester owns its schema and validation) and only reads its
 // "name", which must be unique, ignoring case and surrounding spaces.
 const (
 	testerProfilesBucket = "tester-profiles"

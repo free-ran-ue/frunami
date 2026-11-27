@@ -2,9 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/frulab-favicon.jpg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#02182F" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fru Lab</title>
+    <title>FRUNAMI</title>
+    <script>
+      // Apply the saved light/dark choice before first paint (see src/theme.ts).
+      try {
+        var t = localStorage.getItem('frunami-theme')
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

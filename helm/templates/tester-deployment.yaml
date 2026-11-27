@@ -8,8 +8,8 @@ kind: Deployment
 metadata:
   name: {{ include "tester.name" . }}
   labels:
-    {{- include "frulab.labels" . | nindent 4 }}
-    app.kubernetes.io/name: fru-tester
+    {{- include "frunami.labels" . | nindent 4 }}
+    app.kubernetes.io/name: frunami-tester
 spec:
   replicas: 1
   # one tester per node network: never two at once
@@ -47,10 +47,10 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.tester.terminationGracePeriodSeconds }}
       containers:
-        - name: fru-tester
+        - name: frunami-tester
           image: "{{ .Values.tester.image.repository }}:{{ .Values.tester.image.tag }}"
           imagePullPolicy: {{ .Values.tester.image.pullPolicy }}
-          command: ["./fru-tester", "-c", "tester.yaml"]
+          command: ["./frunami-tester", "-c", "tester.yaml"]
           ports:
             - name: api
               containerPort: {{ .Values.tester.port }}
@@ -73,11 +73,11 @@ spec:
             {{- end }}
           volumeMounts:
             - name: config
-              mountPath: /frutester/tester.yaml
+              mountPath: /frunami-tester/tester.yaml
               subPath: tester.yaml
               readOnly: true
             - name: data
-              mountPath: /frutester/data
+              mountPath: /frunami-tester/data
           {{- with .Values.tester.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
@@ -86,7 +86,7 @@ spec:
         - name: config
           secret:
             secretName: {{ include "tester.name" . }}-config
-        {{- include "frulab.volume" (dict "name" "data" "p" .Values.tester.persistence "claim" (printf "%s-data" (include "tester.name" .))) | nindent 8 }}
+        {{- include "frunami.volume" (dict "name" "data" "p" .Values.tester.persistence "claim" (printf "%s-data" (include "tester.name" .))) | nindent 8 }}
       {{- with .Values.tester.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

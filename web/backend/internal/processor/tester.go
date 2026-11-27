@@ -66,7 +66,7 @@ func (p *Processor) TesterProfileDelete(id string) (*model.ResponseTesterAction,
 }
 
 // compactProfile checks raw is one JSON object of at most 64 KiB.
-// Field-level validation belongs to fru-tester (/api/tester/profile/validate).
+// Field-level validation belongs to frunami-tester (/api/tester/profile/validate).
 func compactProfile(raw []byte) ([]byte, *model.ErrorDetail) {
 	if len(raw) > maxTesterProfileBytes {
 		return nil, &model.ErrorDetail{HttpStatus: http.StatusRequestEntityTooLarge, Detail: "Profile is larger than 64 KiB"}

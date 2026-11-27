@@ -1,20 +1,16 @@
 import type { ReactNode } from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import logoMark from '../../assets/frunami-mark.png'
+import { useTheme } from '../../theme'
 import styles from './sidebar.module.css'
 
 function navItemClassName({ isActive }: { isActive: boolean }): string {
   return `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
 }
 
-// The cube from the fru-lab logo.
+// The FRUNAMI wave mark (assets/frunami-favicon.png, resized).
 export function LogoMark({ size = 28 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" strokeLinejoin="round" strokeWidth={1.2} aria-hidden="true">
-      <path d="M12 2.4L20.6 7 12 11.6 3.4 7z" fill="var(--brand-1)" stroke="var(--brand-1)" />
-      <path d="M3 8.6l8.2 4.6V22L3 17.4z" fill="var(--brand-2)" stroke="var(--brand-2)" />
-      <path d="M12.8 13.2L21 8.6v8.8L12.8 22z" fill="var(--brand-3)" stroke="var(--brand-3)" />
-    </svg>
-  )
+  return <img src={logoMark} width={size} height={size} alt="" aria-hidden="true" className={styles.logoMark} />
 }
 
 // Icon is a 16px line icon in the nav's text colour.
@@ -37,6 +33,8 @@ const ICONS = {
   runs: <Icon><path d="M1.5 8h2.5l2-4.5 3 9 2-4.5h3.5" /></Icon>,
   history: <Icon><circle cx="8" cy="8" r="5.5" /><path d="M8 5v3.2l2 1.3" /></Icon>,
   bench: <Icon><path d="M2.5 11.5a5.5 5.5 0 1 1 11 0M8 11.5l2.5-3.5" /></Icon>,
+  sun: <Icon><circle cx="8" cy="8" r="2.75" /><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1.06 1.06M11.54 11.54l1.06 1.06M3.4 12.6l1.06-1.06M11.54 4.46l1.06-1.06" /></Icon>,
+  moon: <Icon><path d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z" /></Icon>,
   logout: <Icon><path d="M6 2.5H3v11h3M10 5l3 3-3 3M13 8H6" /></Icon>,
 }
 
@@ -49,11 +47,12 @@ interface SidebarProps {
 // Sidebar is the v2 navigation: the brand row, two groups of icon links,
 // and Log out at the bottom.
 export default function Sidebar({ activeRuns = null, onLogout }: SidebarProps) {
+  const [theme, toggleTheme] = useTheme()
   return (
     <aside className={styles.sidebar}>
-      <Link to="/" className={styles.brand} aria-label="fru-lab: go to the dashboard">
+      <Link to="/" className={styles.brand} aria-label="FRUNAMI: go to the dashboard">
         <LogoMark size={38} />
-        <span className={styles.wordmark}>fru-<span className={styles.wordmarkLab}>lab</span></span>
+        <span className={styles.wordmark}>FRUNAMI</span>
       </Link>
 
       <p className={styles.navGroup}>Core network</p>
@@ -76,6 +75,11 @@ export default function Sidebar({ activeRuns = null, onLogout }: SidebarProps) {
         <NavLink to="/tester/history" className={navItemClassName}>{ICONS.history}History</NavLink>
         <NavLink to="/tester/bench" className={navItemClassName}>{ICONS.bench}Bench</NavLink>
       </nav>
+
+      <button type="button" className={styles.themeToggle} onClick={toggleTheme}>
+        {theme === 'dark' ? ICONS.sun : ICONS.moon}
+        {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+      </button>
 
       {onLogout && (
         <button type="button" className={styles.logout} onClick={onLogout}>{ICONS.logout}Log out</button>

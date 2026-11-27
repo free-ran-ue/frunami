@@ -25,12 +25,12 @@ jobs:
       - name: Test
         run: cd web/backend && go test -v ./...
 
-      - name: Build fru-tester
+      - name: Build frunami-tester
         run: cd tester && go build -v ./...
 
       # tests that need root or the sctp kernel module are skipped unless
-      # FRU_TESTER_NETLINK / FRU_TESTER_SCTP are set
-      - name: Test fru-tester
+      # FRUNAMI_TESTER_NETLINK / FRUNAMI_TESTER_SCTP are set
+      - name: Test frunami-tester
         run: cd tester && go test -race -v ./...
 
       - name: Make Backend

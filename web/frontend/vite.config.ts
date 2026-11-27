@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// In production fru-lab's backend serves this app, so the API is on the
+// In production frunami's backend serves this app, so the API is on the
 // same origin. `npm run dev` serves it from Vite instead: forward /api
 // (WebSockets included) to a backend on :8888, or VITE_DEV_API_TARGET.
 // https://vite.dev/config/

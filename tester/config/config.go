@@ -1,4 +1,4 @@
-// Package config loads fru-tester's own YAML config (not a test profile).
+// Package config loads frunami-tester's own YAML config (not a test profile).
 package config
 
 import (
@@ -10,10 +10,10 @@ import (
 )
 
 type Config struct {
-	// TesterName is how fru-lab lists this tester; the host name when
+	// TesterName is how frunami lists this tester; the host name when
 	// empty.
 	TesterName string `yaml:"testerName"`
-	// Listen is host:port for the API. fru-lab reaches it from inside its
+	// Listen is host:port for the API. frunami reaches it from inside its
 	// container, so the default binds every interface; ApiToken guards it.
 	Listen   string `yaml:"listen"`
 	ApiToken string `yaml:"apiToken"`

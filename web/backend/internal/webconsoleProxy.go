@@ -10,9 +10,9 @@ import (
 )
 
 // newWebconsoleProxy forwards /api/webconsole/<rest> to <webconsoleURL>/<rest>,
-// so the browser reaches free5GC's webconsole through fru-lab itself (same
+// so the browser reaches free5GC's webconsole through frunami itself (same
 // origin, whatever port the webconsole is published on). The caller has
-// already checked the user's fru-lab JWT, which is dropped here; the
+// already checked the user's frunami JWT, which is dropped here; the
 // webconsole's own "Token" header passes through.
 func newWebconsoleProxy(webconsoleURL string) (*httputil.ReverseProxy, error) {
 	target, err := url.Parse(webconsoleURL)

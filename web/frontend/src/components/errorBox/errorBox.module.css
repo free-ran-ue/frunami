@@ -29,7 +29,7 @@
 .icon {
   flex: none;
   margin-top: 1px;
-  color: var(--bad);
+  color: var(--bad-ink);
 }
 
 .message {

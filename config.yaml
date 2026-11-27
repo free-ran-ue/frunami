@@ -1,33 +1,33 @@
 backend:
   username: "admin"
-  password: "frulab"
+  password: "frunami"
 
   port: 8888
 
   jwt:
-    secret: "fru-lab"
+    secret: "frunami"
     expiresIn: 24h
 
   db:
     type: "bbolt"
-    path: "/tmp/frulab.db"
+    path: "/tmp/frunami.db"
 
   deploy:
-    workDir: "/tmp/frulab-deploy"
+    workDir: "/tmp/frunami-deploy"
     # a deploy that fails or takes longer than this is taken down again
     timeout: 5m
     webconsole:
       # host port free5GC's webconsole is published on; change it if 5000
-      # is taken on this host (the browser reaches it through fru-lab)
+      # is taken on this host (the browser reaches it through frunami)
       port: 5000
       host: "localhost"
 
   frontendFilePath: "build/frontend"
 
   tester:
-    # fru-tester API (see tester.yaml). Leave url empty to disable the pages.
+    # frunami-tester API (see tester.yaml). Leave url empty to disable the pages.
     url: "http://127.0.0.1:9100"
-    apiToken: "frulab-tester"
+    apiToken: "frunami-tester"
 
 logger:
   level: "info"

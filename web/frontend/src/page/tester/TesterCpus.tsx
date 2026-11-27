@@ -44,7 +44,7 @@ export function CpuMap({ info, cp, dp, irq, onToggle, disabled }: {
               return (
                 <button key={c} type="button" disabled={disabled || !usable}
                   className={`${styles.cpu} ${side} ${usable ? '' : styles.cpuOff}`}
-                  title={`CPU ${c}${usable ? '' : ' — not available to fru-tester'}${irq.includes(c) ? ' — NIC interrupts' : ''}`}
+                  title={`CPU ${c}${usable ? '' : ' — not available to frunami-tester'}${irq.includes(c) ? ' — NIC interrupts' : ''}`}
                   onClick={() => onToggle(c)}>
                   {c}{irq.includes(c) && <i className={styles.cpuIrq} />}
                 </button>

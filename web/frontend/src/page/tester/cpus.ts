@@ -1,4 +1,4 @@
-// CPU lists in Linux form ("0-3,8"), as fru-tester reads and writes them.
+// CPU lists in Linux form ("0-3,8"), as frunami-tester reads and writes them.
 
 // parseCpus returns the CPUs of a list, sorted, or null if it is not one.
 export function parseCpus(s: string): number[] | null {

@@ -17,18 +17,18 @@ import (
 )
 
 // defaultTesterID is the tester in config.yaml (backend.tester): it runs
-// next to fru-lab, the other tester pages use it, and it cannot be
+// next to frunami, the other tester pages use it, and it cannot be
 // removed from the Status page.
 const defaultTesterID = "default"
 
-// testerStore is the slice of fru-lab's DB that keeps the added testers.
+// testerStore is the slice of frunami's DB that keeps the added testers.
 type testerStore interface {
 	ListTesters() ([]flctx.TesterRecord, error)
 	AddTester(url, apiToken string) (*flctx.TesterRecord, error)
 	DeleteTester(id string) error
 }
 
-// testerTarget is one tester fru-lab can reach.
+// testerTarget is one tester frunami can reach.
 type testerTarget struct {
 	id      string
 	url     string
@@ -45,7 +45,7 @@ type TesterEntry struct {
 	BuiltIn bool   `json:"builtIn"`
 }
 
-// TesterAddRequest adds a tester by where fru-lab reaches it.
+// TesterAddRequest adds a tester by where frunami reaches it.
 type TesterAddRequest struct {
 	URL      string `json:"url"`
 	ApiToken string `json:"apiToken"`
@@ -132,7 +132,7 @@ func (r *testerRegistry) get(id string) *testerTarget {
 	return nil
 }
 
-// add checks that a fru-tester answers at testerURL with apiToken, then
+// add checks that a frunami-tester answers at testerURL with apiToken, then
 // keeps it. The error says what to fix.
 func (r *testerRegistry) add(ctx context.Context, testerURL, apiToken string) (*TesterAdded, error) {
 	testerURL = strings.TrimRight(strings.TrimSpace(testerURL), "/")
@@ -180,14 +180,14 @@ func (r *testerRegistry) probe(ctx context.Context, testerURL, apiToken string) 
 	req.Header.Set("Authorization", "Bearer "+apiToken)
 	resp, err := r.client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("no fru-tester answered at %s: %v", testerURL, err)
+		return "", fmt.Errorf("no frunami-tester answered at %s: %v", testerURL, err)
 	}
 	defer func() { _ = resp.Body.Close() }()
 	switch {
 	case resp.StatusCode == http.StatusUnauthorized:
 		return "", errors.New("that tester rejected the API token: use the apiToken in its tester.yaml")
 	case resp.StatusCode == http.StatusNotFound:
-		return "", fmt.Errorf("%s answered but has no /api/status: is it a fru-tester, and a recent one?", testerURL)
+		return "", fmt.Errorf("%s answered but has no /api/status: is it a frunami-tester, and a recent one?", testerURL)
 	case resp.StatusCode != http.StatusOK:
 		return "", fmt.Errorf("%s answered %s", testerURL, resp.Status)
 	}
@@ -196,7 +196,7 @@ func (r *testerRegistry) probe(ctx context.Context, testerURL, apiToken string) 
 		Hostname string `json:"hostname"`
 	}
 	if err := json.NewDecoder(io.LimitReader(resp.Body, 1<<20)).Decode(&s); err != nil {
-		return "", fmt.Errorf("%s did not answer like a fru-tester: %v", testerURL, err)
+		return "", fmt.Errorf("%s did not answer like a frunami-tester: %v", testerURL, err)
 	}
 	if s.Name == "" {
 		return s.Hostname, nil

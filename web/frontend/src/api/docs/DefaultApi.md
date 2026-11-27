@@ -45,7 +45,7 @@ All URIs are relative to *http://127.0.0.1:5000*
 |[**testerHistoryList**](#testerhistorylist) | **GET** /api/tester/history | Finished runs, newest first|
 |[**testerHistoryRename**](#testerhistoryrename) | **PATCH** /api/tester/history/{runId} | Rename a finished run|
 |[**testerHistoryReportHtml**](#testerhistoryreporthtml) | **GET** /api/tester/history/{runId}/report.html | One finished run\&#39;s report as a self-contained HTML page|
-|[**testerNetworkInterfaces**](#testernetworkinterfaces) | **GET** /api/tester/network/interfaces | Interfaces on fru-tester\&#39;s host|
+|[**testerNetworkInterfaces**](#testernetworkinterfaces) | **GET** /api/tester/network/interfaces | Interfaces on frunami-tester\&#39;s host|
 |[**testerNetworkPing**](#testernetworkping) | **POST** /api/tester/network/ping | Ping test of one network|
 |[**testerProfileCreate**](#testerprofilecreate) | **POST** /api/tester/profiles | Save a new Throughput Tester profile|
 |[**testerProfileDelete**](#testerprofiledelete) | **DELETE** /api/tester/profiles/{id} | Delete a saved profile|
@@ -62,7 +62,7 @@ All URIs are relative to *http://127.0.0.1:5000*
 |[**testerSystemGet**](#testersystemget) | **GET** /api/tester/system | The tester host\&#39;s CPU allocation and layout (Status page)|
 |[**testersAdd**](#testersadd) | **POST** /api/testers | Add a tester|
 |[**testersDelete**](#testersdelete) | **DELETE** /api/testers/{id} | Remove an added tester|
-|[**testersList**](#testerslist) | **GET** /api/testers | Every tester fru-lab can reach (Status page)|
+|[**testersList**](#testerslist) | **GET** /api/testers | Every tester frunami can reach (Status page)|
 
 # **deployFree5gcDown**
 > MessageResponse deployFree5gcDown()
@@ -1184,7 +1184,7 @@ No authorization required
 # **testerBenchGet**
 > TesterBenchResult testerBenchGet()
 
-Forwarded to fru-tester. State is `idle` before the first bench.
+Forwarded to frunami-tester. State is `idle` before the first bench.
 
 ### Example
 
@@ -1228,7 +1228,7 @@ This endpoint does not have any parameters.
 # **testerBenchStart**
 > TesterBenchResult testerBenchStart(testerBenchSettings)
 
-Measures how fast this host\'s fru-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
+Measures how fast this host\'s frunami-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
 
 ### Example
 
@@ -1328,7 +1328,7 @@ const { status, data } = await apiInstance.testerByIdBenchGet(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**404** | No tester with that id |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1387,7 +1387,7 @@ const { status, data } = await apiInstance.testerByIdBenchStart(
 |**400** | Invalid settings |  -  |
 |**404** | No tester with that id |  -  |
 |**409** | A bench or a run is already running on that tester |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1440,7 +1440,7 @@ const { status, data } = await apiInstance.testerByIdCpuLoad(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**404** | No tester with that id |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1497,7 +1497,7 @@ const { status, data } = await apiInstance.testerByIdCpusPut(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**404** | No tester with that id |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1550,7 +1550,7 @@ const { status, data } = await apiInstance.testerByIdNetworkInterfaces(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**404** | No tester with that id |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1609,7 +1609,7 @@ const { status, data } = await apiInstance.testerByIdNetworkPing(
 |**400** | Invalid profile |  -  |
 |**409** | A run is active |  -  |
 |**404** | No tester with that id |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1666,7 +1666,7 @@ const { status, data } = await apiInstance.testerByIdProfileValidate(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**404** | No tester with that id |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1728,7 +1728,7 @@ const { status, data } = await apiInstance.testerByIdRun(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**404** | No tester with that id |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1787,7 +1787,7 @@ const { status, data } = await apiInstance.testerByIdRunStart(
 |**400** | Invalid profile |  -  |
 |**409** | A run or a bench is already running |  -  |
 |**404** | No tester with that id |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1841,7 +1841,7 @@ const { status, data } = await apiInstance.testerByIdRunStop(
 |**202** | Stop requested |  -  |
 |**409** | No active run |  -  |
 |**404** | No tester with that id |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1894,7 +1894,7 @@ const { status, data } = await apiInstance.testerByIdStatus(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**404** | No tester with that id |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1947,14 +1947,14 @@ const { status, data } = await apiInstance.testerByIdSystem(
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
 |**404** | No tester with that id |  -  |
-|**502** | The tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | The tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **testerHistoryDelete**
 > MessageResponse testerHistoryDelete(testerHistoryDeleteRequest)
 
-fru-lab remembers the deleted runs, so a tester that still keeps one does not bring it back.
+frunami remembers the deleted runs, so a tester that still keeps one does not bring it back.
 
 ### Example
 
@@ -2058,7 +2058,7 @@ const { status, data } = await apiInstance.testerHistoryGet(
 # **testerHistoryList**
 > Array<TesterHistorySummary> testerHistoryList()
 
-fru-lab keeps the last 50 runs fru-tester finished.
+frunami keeps the last 50 runs frunami-tester finished.
 
 ### Example
 
@@ -2210,7 +2210,7 @@ const { status, data } = await apiInstance.testerHistoryReportHtml(
 # **testerNetworkInterfaces**
 > Array<TesterInterface> testerNetworkInterfaces()
 
-Forwarded to fru-tester. Every link on the host where fru-tester runs, for the Setup page\'s interface menus.
+Forwarded to frunami-tester. Every link on the host where frunami-tester runs, for the Setup page\'s interface menus.
 
 ### Example
 
@@ -2248,7 +2248,7 @@ This endpoint does not have any parameters.
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
-|**502** | fru-tester is unreachable |  -  |
+|**502** | frunami-tester is unreachable |  -  |
 |**503** | backend.tester.url is not configured |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -2256,7 +2256,7 @@ This endpoint does not have any parameters.
 # **testerNetworkPing**
 > TesterPingResult testerNetworkPing(testerPingRequest)
 
-Forwarded to fru-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR\'s prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF\'s N3 or the UPF\'s N6 three times, and removes the address again. Only that network\'s fields are checked. Not while a run is active.
+Forwarded to frunami-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR\'s prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF\'s N3 or the UPF\'s N6 three times, and removes the address again. Only that network\'s fields are checked. Not while a run is active.
 
 ### Example
 
@@ -2569,7 +2569,7 @@ const { status, data } = await apiInstance.testerProfileUpdate(
 # **testerProfileValidate**
 > TesterValidateResponse testerProfileValidate(testerProfile)
 
-Forwarded to fru-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
+Forwarded to frunami-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
 
 ### Example
 
@@ -2615,7 +2615,7 @@ const { status, data } = await apiInstance.testerProfileValidate(
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
-|**502** | fru-tester is unreachable |  -  |
+|**502** | frunami-tester is unreachable |  -  |
 |**503** | backend.tester.url is not configured |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -2623,7 +2623,7 @@ const { status, data } = await apiInstance.testerProfileValidate(
 # **testerRunGet**
 > TesterRunSnapshot testerRunGet()
 
-Forwarded to fru-tester. State is `idle` before the first run.
+Forwarded to frunami-tester. State is `idle` before the first run.
 
 ### Example
 
@@ -2674,7 +2674,7 @@ const { status, data } = await apiInstance.testerRunGet(
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
-|**502** | fru-tester is unreachable |  -  |
+|**502** | frunami-tester is unreachable |  -  |
 |**503** | backend.tester.url is not configured |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -2682,7 +2682,7 @@ const { status, data } = await apiInstance.testerRunGet(
 # **testerRunStart**
 > TesterRunSnapshot testerRunStart(testerProfile)
 
-Forwarded to fru-tester. Only one run may be active at a time.
+Forwarded to frunami-tester. Only one run may be active at a time.
 
 ### Example
 
@@ -2730,7 +2730,7 @@ const { status, data } = await apiInstance.testerRunStart(
 |**202** | Run started |  -  |
 |**400** | Profile is invalid |  -  |
 |**409** | A run is already active |  -  |
-|**502** | fru-tester is unreachable |  -  |
+|**502** | frunami-tester is unreachable |  -  |
 |**503** | backend.tester.url is not configured |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -2738,7 +2738,7 @@ const { status, data } = await apiInstance.testerRunStart(
 # **testerRunStop**
 > TesterRunSnapshot testerRunStop()
 
-Stops the traffic, deregisters every registered UE, closes every N2 association and removes what fru-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
+Stops the traffic, deregisters every registered UE, closes every N2 association and removes what frunami-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
 
 ### Example
 
@@ -2783,7 +2783,7 @@ This endpoint does not have any parameters.
 # **testerStatusGet**
 > TesterStatus testerStatusGet()
 
-Forwarded to fru-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when fru-tester runs in a container), load average and the capabilities a run needs. A 502 means fru-lab could not reach fru-tester.
+Forwarded to frunami-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when frunami-tester runs in a container), load average and the capabilities a run needs. A 502 means frunami could not reach frunami-tester.
 
 ### Example
 
@@ -2821,14 +2821,14 @@ This endpoint does not have any parameters.
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
-|**502** | fru-tester is unreachable or rejected fru-lab\&#39;s API token |  -  |
+|**502** | frunami-tester is unreachable or rejected frunami\&#39;s API token |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **testerSystemCpuLoad**
 > TesterCpuLoad testerSystemCpuLoad()
 
-Forwarded to fru-tester, which reads /proc/stat. The whole host\'s load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
+Forwarded to frunami-tester, which reads /proc/stat. The whole host\'s load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
 
 ### Example
 
@@ -2872,7 +2872,7 @@ This endpoint does not have any parameters.
 # **testerSystemCpusPut**
 > TesterCpuAllocation testerSystemCpusPut(testerCpuAllocation)
 
-Forwarded to fru-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
+Forwarded to frunami-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
 
 ### Example
 
@@ -2926,7 +2926,7 @@ const { status, data } = await apiInstance.testerSystemCpusPut(
 # **testerSystemGet**
 > TesterSystemInfo testerSystemGet()
 
-Forwarded to fru-tester. cpus is what the next run uses; topology helps choose it.
+Forwarded to frunami-tester. cpus is what the next run uses; topology helps choose it.
 
 ### Example
 
@@ -2970,7 +2970,7 @@ This endpoint does not have any parameters.
 # **testersAdd**
 > TesterAdded testersAdd(testerAddRequest)
 
-fru-lab first asks the tester for its /api/status with the token; it is kept only if it answers.
+frunami first asks the tester for its /api/status with the token; it is kept only if it answers.
 
 ### Example
 
@@ -3023,7 +3023,7 @@ const { status, data } = await apiInstance.testersAdd(
 # **testersDelete**
 > MessageResponse testersDelete()
 
-Only fru-lab forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
+Only frunami forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
 
 ### Example
 

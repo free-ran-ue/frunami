@@ -84,7 +84,7 @@ export default function AppLayout({ crumbs, crumbExtra, headerActions, overlay, 
         <footer className={styles.status}>
           <span>{live ? 'api: connected' : 'api: not answering'} · polled every 5 s</span>
           <span>{count === null ? 'runs: —' : `runs in progress: ${count}`}</span>
-          <span className={styles.statusRight}>fru-lab</span>
+          <span className={styles.statusRight}>FRUNAMI</span>
         </footer>
       </main>
     </div>

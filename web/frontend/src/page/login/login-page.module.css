@@ -6,11 +6,9 @@
   color: var(--ink);
 }
 
-/* Left: brand panel with the logo banner and three feature lines.
-   Its tint (#F1F0FB in the prototype) sits between --accent-soft and
-   --surface-sunken, so it is a local value. */
+/* Left: brand panel with the banner and three feature lines, on the
+   brand background gradient in both modes (the banner art is dark). */
 .brandPanel {
-  --login-brand-bg: #F1F0FB;
   flex: 999 1 35rem;
   min-width: 0;
   display: flex;
@@ -18,7 +16,7 @@
   justify-content: center;
   padding: 3rem 2.5rem;
   gap: 2rem;
-  background: var(--login-brand-bg);
+  background: var(--gradient-bg);
 }
 
 .banner {
@@ -48,12 +46,12 @@
 .featureTitle {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--ink);
+  color: var(--chrome-strong);
 }
 
 .featureText {
   font-size: 0.8125rem;
-  color: var(--muted);
+  color: var(--chrome-text);
 }
 
 /* Right: sign-in form. */
@@ -83,12 +81,8 @@
 .wordmark {
   font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.04em;
   color: var(--ink);
-}
-
-.wordmarkLab {
-  color: var(--brand-3);
 }
 
 .headerBlock {
@@ -151,7 +145,7 @@
   border: 0;
   border-radius: var(--radius-sm);
   background: var(--accent);
-  color: var(--surface);
+  color: var(--on-accent);
   font: inherit;
   font-size: 0.9375rem;
   font-weight: 500;

@@ -5,7 +5,7 @@ package profile
 import "net/netip"
 
 // Profile is what the setup page edits and what a run starts from. Field
-// names are the JSON contract shared with fru-lab's frontend.
+// names are the JSON contract shared with frunami's frontend.
 type Profile struct {
 	Name    string      `json:"name"`
 	Scale   Scale       `json:"scale"`

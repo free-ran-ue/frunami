@@ -68,7 +68,7 @@
 .btnPrimary {
   border-color: var(--accent);
   background: var(--accent);
-  color: #FFFFFF;
+  color: var(--on-accent);
 }
 
 .btnPrimary:hover:not(:disabled) {
@@ -78,8 +78,8 @@
 
 /* v2 .btn-d: outlined in the bad colour */
 .btnDanger {
-  border-color: var(--bad);
-  color: var(--bad);
+  border-color: var(--bad-ink);
+  color: var(--bad-ink);
 }
 
 .btnDanger:hover:not(:disabled) {

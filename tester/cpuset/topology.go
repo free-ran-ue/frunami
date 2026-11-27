@@ -13,7 +13,7 @@ import (
 // Topology is what the Status page shows to help choose CPUs.
 type Topology struct {
 	Online     string      `json:"online"`  // CPUs the kernel runs
-	Allowed    string      `json:"allowed"` // of those, the ones fru-tester may use
+	Allowed    string      `json:"allowed"` // of those, the ones frunami-tester may use
 	Nodes      []Node      `json:"nodes"`
 	Interfaces []NicLayout `json:"interfaces"`
 }

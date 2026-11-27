@@ -1,6 +1,7 @@
-/* fru-lab design tokens. Colours follow the logo (docs/images/frulab-logo.png):
-   indigo-to-violet on a near-black ink. Status colours stay green/amber/red
-   so they read at a glance. Use the variables, not hex values, in modules. */
+/* FRUNAMI design tokens: Deep Ocean Blue & Cyan (see CLAUDE.md §1).
+   Every colour in the UI comes from these variables; modules and inline
+   styles use var(--…), never hex values. Light is the default; dark comes
+   from the OS setting or from data-theme="dark" on <html>. */
 @import '@fontsource/ibm-plex-sans/400.css';
 @import '@fontsource/ibm-plex-sans/500.css';
 @import '@fontsource/ibm-plex-sans/600.css';
@@ -15,48 +16,77 @@
 }
 
 :root {
+  color-scheme: light;
+
   /* type */
   --font-sans: 'IBM Plex Sans', 'Segoe UI', 'Noto Sans', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
+  /* brand palette (same in both modes) */
+  --primary: #0088E8;
+  --primary-dark: #0062D6;
+  --primary-light: #E6F8FF;
+  --secondary: #00E5CC;
+  --mint: #8CFFAA;          /* brand Accent */
+  --cyan: #00D9F5;
+  --navy: #063B60;
+  --ocean: #02182F;
+  --ice: #F5FAFF;
+  --gradient-primary: linear-gradient(135deg, #0088E8, #00E5CC);
+  --gradient-ocean: linear-gradient(135deg, #0062D6, #00D9F5, #8CFFAA);
+  --gradient-bg: linear-gradient(135deg, #063B60, #02182F);
+
   /* surfaces */
-  --bg: #F5F5FA;            /* page */
+  --bg: #F5FAFF;            /* page */
   --surface: #FFFFFF;       /* panels, cards */
-  --surface-sunken: #F9F8FD;/* table heads, footers */
-  --surface-muted: #F0EFF6; /* tracks, tags */
-  --border: #DEDCEB;        /* panel borders */
-  --border-soft: #EEEDF5;   /* row dividers */
-  --border-strong: #CFCDE0; /* inputs, secondary buttons */
+  --surface-sunken: #F8FBFE;/* table heads, footers */
+  --surface-muted: #EEF4FA; /* tracks, tags */
+  --border: #DCE7F0;        /* panel borders */
+  --border-soft: #EAF1F7;   /* row dividers */
+  --border-strong: #C3D3E2; /* inputs, secondary buttons */
+  --overlay: rgba(2, 24, 47, 0.55);
 
   /* text */
-  --ink: #13122B;
-  --ink-2: #2D2B48;         /* labels */
-  --muted: #5B5975;         /* secondary text, 4.5:1 on white */
+  --ink: #02182F;
+  --ink-2: #1E3A55;         /* labels */
+  --muted: #64748B;         /* secondary text */
 
-  /* brand */
-  --accent: #4F46E5;
-  --accent-hover: #4338CA;
-  --accent-ink: #3730A3;    /* accent text on tinted bg */
-  --accent-soft: #ECEBFD;   /* selected rows, chips */
-  --accent-ring: #E4E2FB;
-  --violet: #A855F7;        /* second series (uplink, 2nd tester) */
-  --brand-1: #8B7CF6;       /* cube faces */
-  --brand-2: #4F46E5;
-  --brand-3: #6D3FE8;
+  /* interactive */
+  --accent: var(--primary);         /* primary buttons, fills, 1st series */
+  --accent-hover: var(--primary-dark);
+  --accent-ink: #0062D6;            /* links, accent text on light bg (5.6:1) */
+  --accent-soft: #E6F8FF;           /* selected / active background */
+  --accent-ring: #B5E3FA;
+  --on-accent: #FFFFFF;             /* text on --accent */
 
-  /* chrome (sidebar, log viewer) */
-  --chrome: #13122B;
-  --chrome-hover: #1E1D3D;
-  --chrome-active: #2B2858;
-  --chrome-text: #CBC9E6;
-  --chrome-muted: #908DB9;
-  --chrome-accent: #A99BFF;
+  /* chart series, in order (CLAUDE.md §1.6). Light mode uses deeper teal /
+     cyan so thin lines keep 3:1 against white. */
+  --chart-1: #0088E8;
+  --chart-2: #009E8A;
+  --chart-3: #0092B8;
+  --chart-4: #063B60;
 
-  /* status */
-  --ok: #12A150;  --ok-ink: #0B6B36;  --ok-bg: #E7F6EE;
-  --warn: #B45309; --warn-ink: #8A4B08; --warn-bg: #FDF1E3;
-  --bad: #B42318; --bad-ink: #9A1C13; --bad-bg: #FDECEA;
-  --idle-ink: #3E3C58; --idle-bg: #F0EFF6;
+  /* chrome: sidebar, log viewer, terminal. Deep Ocean in both modes. */
+  --chrome: #02182F;
+  --chrome-hover: #0B2942;
+  --chrome-active: #063B60;
+  --chrome-border: #0B2942;
+  --chrome-strong: #F5FAFF; /* headings / active text */
+  --chrome-text: #C8DAEA;
+  --chrome-muted: #94AFC5;
+  --chrome-accent: #00D9F5;
+  --log-info: #8CFFAA;
+  --log-warn: #FBBF24;
+  --log-err: #FF8A8A;
+
+  /* status: base for dots/icons/borders, -ink for text, -bg for tints */
+  --ok: #10B981;   --ok-ink: #047857;   --ok-bg: #E7F8F1;
+  --warn: #F59E0B; --warn-ink: #B45309; --warn-bg: #FEF5E6;
+  --bad: #EF4444;  --bad-ink: #B91C1C;  --bad-bg: #FDECEC;
+  --bad-strong: #DC2626;  /* filled danger buttons, white text 4.8:1 */
+  --bad-strong-hover: #B91C1C;
+  --info: #00D9F5; --info-ink: #0369A1; --info-bg: #E6F8FF;
+  --idle-ink: #475569; --idle-bg: #EEF4FA;
 
   /* shape */
   --radius: 0.5rem;
@@ -72,6 +102,68 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark mode: system preference unless the user picked light, or an
+   explicit data-theme="dark". Keep the two blocks identical. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #02182F;
+    --surface: #0B2942;
+    --surface-sunken: #082238;
+    --surface-muted: #0F3150;
+    --border: #16435E;
+    --border-soft: #113752;
+    --border-strong: #22567A;
+    --overlay: rgba(0, 8, 18, 0.65);
+    --ink: #F5FAFF;
+    --ink-2: #D3E2EF;
+    --muted: #94AFC5;
+    --accent-ink: #5CC8FF;
+    --accent-soft: #063B60;
+    --accent-ring: #0E5A8A;
+    --chart-1: #0088E8;
+    --chart-2: #00E5CC;
+    --chart-3: #00D9F5;
+    --chart-4: #8CFFAA;
+    --chrome: #011326;
+    --chrome-border: #16435E;
+    --ok-ink: #34D399;   --ok-bg: #0A3A35;
+    --warn-ink: #FBBF24; --warn-bg: #3A2E0E;
+    --bad-ink: #F87171;  --bad-bg: #3B1724;
+    --info-ink: #00D9F5; --info-bg: #063B60;
+    --idle-ink: #C8DAEA; --idle-bg: #16435E;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #02182F;
+  --surface: #0B2942;
+  --surface-sunken: #082238;
+  --surface-muted: #0F3150;
+  --border: #16435E;
+  --border-soft: #113752;
+  --border-strong: #22567A;
+  --overlay: rgba(0, 8, 18, 0.65);
+  --ink: #F5FAFF;
+  --ink-2: #D3E2EF;
+  --muted: #94AFC5;
+  --accent-ink: #5CC8FF;
+  --accent-soft: #063B60;
+  --accent-ring: #0E5A8A;
+  --chart-1: #0088E8;
+  --chart-2: #00E5CC;
+  --chart-3: #00D9F5;
+  --chart-4: #8CFFAA;
+  --chrome: #011326;
+  --chrome-border: #16435E;
+  --ok-ink: #34D399;   --ok-bg: #0A3A35;
+  --warn-ink: #FBBF24; --warn-bg: #3A2E0E;
+  --bad-ink: #F87171;  --bad-bg: #3B1724;
+  --info-ink: #00D9F5; --info-bg: #063B60;
+  --idle-ink: #C8DAEA; --idle-bg: #16435E;
 }
 
 /* Everything is sized in rem, so the whole UI follows the window:
@@ -95,11 +187,12 @@ textarea {
 }
 
 a {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 a:hover {
-  color: var(--accent-hover);
+  color: var(--accent-ink);
+  text-decoration: underline;
 }
 
 :focus-visible {

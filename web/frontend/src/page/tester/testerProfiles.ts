@@ -21,7 +21,7 @@ export function rememberProfileId(id: string | null) {
   }
 }
 
-// sameName matches names the way fru-lab does: ignoring case and
+// sameName matches names the way FRUNAMI does: ignoring case and
 // surrounding spaces.
 export function sameName(a: string, b: string): boolean {
   return a.trim().toLowerCase() === b.trim().toLowerCase()
@@ -42,7 +42,7 @@ export function freeName(list: TesterStoredProfile[], base: string): string {
   return candidate
 }
 
-// byName sorts profiles the way fru-lab lists them.
+// byName sorts profiles the way FRUNAMI lists them.
 export function byName(list: TesterStoredProfile[]): TesterStoredProfile[] {
   return [...list].sort((a, b) => a.profile.name.trim().toLowerCase().localeCompare(b.profile.name.trim().toLowerCase()))
 }

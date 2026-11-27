@@ -48,7 +48,7 @@ function avgMs(rtts: number[]): string {
   return avg < 1 ? avg.toFixed(2) : avg.toFixed(1)
 }
 
-// PingTest checks one network the way a run would use it: fru-tester puts
+// PingTest checks one network the way a run would use it: frunami-tester puts
 // the run's address on the interface, pings the core's address and removes
 // it again.
 export default function PingTest({ plane, label, profile, testerId, onOutcome }: PingTestProps) {

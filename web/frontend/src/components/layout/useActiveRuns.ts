@@ -8,7 +8,7 @@ const POLL_MS = 5000
 export interface ActiveRuns {
   // runs in progress across every tester; null until the first answer
   count: number | null
-  // whether fru-lab's API answered the last poll
+  // whether FRUNAMI's API answered the last poll
   live: boolean
 }
 

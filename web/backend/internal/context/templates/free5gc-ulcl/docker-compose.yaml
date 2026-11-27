@@ -214,7 +214,7 @@ services:
 
   # PDU Session Anchor UPF: N9-facing (i-upf) and N6 (DN, external/implicit).
   # Reachable over the same shared cn-ran bridge as the rest of the core -
-  # fru-lab collapses N2/N3/N9 onto that one bridge rather than modeling
+  # frunami collapses N2/N3/N9 onto that one bridge rather than modeling
   # each as its own network segment.
   psa-upf:
     container_name: psa-upf
@@ -266,11 +266,11 @@ networks:
 
   # shared with the free-ran-ue target (amf/i-upf/psa-upf <-> gnb). Not
   # owned by either compose project: created once, up front, by the backend
-  # (docker network create frulab-cn-ran --subnet 10.0.1.0/24
+  # (docker network create frunami-cn-ran --subnet 10.0.1.0/24
   #  -o com.docker.network.bridge.name=docker-cn-ran)
   cn-ran:
     external: true
-    name: frulab-cn-ran
+    name: frunami-cn-ran
 
 volumes:
   dbdata:

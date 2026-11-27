@@ -128,17 +128,17 @@ func newComposeContext(ie *composeContextIE) (*composeContext, error) {
 		targets:        defaultTargets(),
 		sharedNetworks: []sharedNetwork{
 			// free5gc (amf/upf) <-> gnb
-			{name: "frulab-cn-ran", subnet: "10.0.1.0/24", bridgeName: "docker-cn-ran"},
+			{name: "frunami-cn-ran", subnet: "10.0.1.0/24", bridgeName: "docker-cn-ran"},
 			// gnb <-> ue (ue isn't a deploy target yet, but the network is
 			// shared infrastructure independent of either target's lifecycle,
 			// same reasoning as cn-ran, so it's created up front too)
-			{name: "frulab-ran-ue", subnet: "10.0.2.0/24", bridgeName: "docker-ran-ue"},
+			{name: "frunami-ran-ue", subnet: "10.0.2.0/24", bridgeName: "docker-ran-ue"},
 		},
 
 		BackendLogger: ie.BackendLogger,
 	}
 
-	// fru-lab also runs without a Docker daemon (in Kubernetes, to drive
+	// frunami also runs without a Docker daemon (in Kubernetes, to drive
 	// the throughput tester only): then the deploy pages fail with the
 	// daemon's error, and the networks are created on the next deploy.
 	if err := c.networks(context.Background()); err != nil {
@@ -152,7 +152,7 @@ func newComposeContext(ie *composeContextIE) (*composeContext, error) {
 func defaultTargets() map[string]composeTarget {
 	return map[string]composeTarget{
 		constant.DEPLOY_TARGET_FREE5GC: {
-			projectName: "frulab-free5gc",
+			projectName: "frunami-free5gc",
 			composeTemplate: composeTemplate{
 				templateFS:  free5gcTemplateFS,
 				templateDir: "templates/free5gc",
@@ -173,7 +173,7 @@ func defaultTargets() map[string]composeTarget {
 			},
 		},
 		constant.DEPLOY_TARGET_GNB: {
-			projectName: "frulab-gnb",
+			projectName: "frunami-gnb",
 			composeTemplate: composeTemplate{
 				templateFS:  gnbTemplateFS,
 				templateDir: "templates/gnb",
@@ -184,14 +184,14 @@ func defaultTargets() map[string]composeTarget {
 		// variants of gnb, since under FREE5GC_TEMPLATE_ULCL_2SLICE both
 		// need to be deployable at the same time.
 		constant.DEPLOY_TARGET_GNB_SLICE1: {
-			projectName: "frulab-gnb-slice1",
+			projectName: "frunami-gnb-slice1",
 			composeTemplate: composeTemplate{
 				templateFS:  gnbSlice1TemplateFS,
 				templateDir: "templates/gnb-slice1",
 			},
 		},
 		constant.DEPLOY_TARGET_GNB_SLICE2: {
-			projectName: "frulab-gnb-slice2",
+			projectName: "frunami-gnb-slice2",
 			composeTemplate: composeTemplate{
 				templateFS:  gnbSlice2TemplateFS,
 				templateDir: "templates/gnb-slice2",
@@ -334,7 +334,7 @@ const (
 )
 
 // publishWebconsole publishes only the webconsole's HTTP port, on the host
-// port fru-lab is configured with (deploy.webconsole.port), so a host that
+// port frunami is configured with (deploy.webconsole.port), so a host that
 // already uses 5000 can still deploy. Its FTP ports (2121/2122, CDR upload
 // from the CHF) stay inside the compose network.
 func publishWebconsole(project *types.Project, hostPort int) {
@@ -602,7 +602,7 @@ func (c *composeContext) ueWorkingDir(instanceID string) string {
 }
 
 func (c *composeContext) ueProjectName(instanceID string) string {
-	return "frulab-ue-" + instanceID
+	return "frunami-ue-" + instanceID
 }
 
 // loadUeProject mirrors loadProject's materialize-then-load approach, but

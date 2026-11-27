@@ -17,11 +17,11 @@ import (
 // xdpTestbed puts the tester on veth frd-tester (gNB N3 10.97.0.10, sink
 // 10.97.0.2, UE pool routed via 10.97.0.1) and a fake UPF on 10.97.0.1 in
 // namespace frd-upf, where the UE pool is local so downlink reaches it.
-// It needs root: FRU_TESTER_NETNS=1 and sudo.
+// It needs root: FRUNAMI_TESTER_NETNS=1 and sudo.
 func xdpTestbed(t *testing.T, port uint16) *fakeUPF {
 	t.Helper()
-	if os.Getenv("FRU_TESTER_NETNS") == "" {
-		t.Skip("set FRU_TESTER_NETNS=1 and run as root")
+	if os.Getenv("FRUNAMI_TESTER_NETNS") == "" {
+		t.Skip("set FRUNAMI_TESTER_NETNS=1 and run as root")
 	}
 	t.Cleanup(func() {
 		_ = exec.Command("ip", "link", "del", "frd-tester").Run()

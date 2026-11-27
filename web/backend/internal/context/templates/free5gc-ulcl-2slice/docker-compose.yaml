@@ -324,11 +324,11 @@ networks:
 
   # shared with the free-ran-ue target (amf/i-upf-*/psa-upf-* <-> gnb). Not
   # owned by either compose project: created once, up front, by the backend
-  # (docker network create frulab-cn-ran --subnet 10.0.1.0/24
+  # (docker network create frunami-cn-ran --subnet 10.0.1.0/24
   #  -o com.docker.network.bridge.name=docker-cn-ran)
   cn-ran:
     external: true
-    name: frulab-cn-ran
+    name: frunami-cn-ran
 
 volumes:
   dbdata:

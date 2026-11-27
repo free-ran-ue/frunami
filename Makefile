@@ -8,10 +8,10 @@ FRONTEND_STAMP := build/frontend/.stamp
 
 all: backend frontend tester
 
-build/fru-lab: $(BACKEND_SRC)
+build/frunami: $(BACKEND_SRC)
 	@echo "[+] Building backend..."
 	mkdir -p build
-	cd web/backend && go build -o ../../build/fru-lab .
+	cd web/backend && go build -o ../../build/frunami .
 	@echo "[✔] Backend build finished"
 
 build/frontend: $(FRONTEND_SRC)
@@ -26,22 +26,22 @@ build/frontend: $(FRONTEND_SRC)
 	@cp -r web/frontend/dist/. build/frontend/
 	@touch $(FRONTEND_STAMP)
 
-build/fru-tester: $(TESTER_SRC)
-	@echo "[+] Building fru-tester..."
+build/frunami-tester: $(TESTER_SRC)
+	@echo "[+] Building frunami-tester..."
 	mkdir -p build
-	cd tester && go build -o ../build/fru-tester .
-	@echo "[✔] fru-tester build finished"
+	cd tester && go build -o ../build/frunami-tester .
+	@echo "[✔] frunami-tester build finished"
 
-tester: build/fru-tester
+tester: build/frunami-tester
 
 backend:
-	@if [ -f build/fru-lab ]; then \
-		if [ -z "$$(find web/backend -type f -newer build/fru-lab)" ]; then \
+	@if [ -f build/frunami ]; then \
+		if [ -z "$$(find web/backend -type f -newer build/frunami)" ]; then \
 			echo "[✔] backend is up-to-date, no build needed"; \
 			exit 0; \
 		fi; \
 	fi; \
-	$(MAKE) build/fru-lab
+	$(MAKE) build/frunami
 
 frontend:
 	@if [ -f $(FRONTEND_STAMP) ]; then \
@@ -63,12 +63,12 @@ openapi-webconsole:
 	@echo "[✔] webconsole OpenAPI client generated"
 
 run:
-	./build/fru-lab -c config.yaml
+	./build/frunami -c config.yaml
 
 # needs root for netlink (gNB IPs) and the sctp kernel module
 run-tester:
 	sudo modprobe sctp
-	sudo ./build/fru-tester -c tester.yaml
+	sudo ./build/frunami-tester -c tester.yaml
 
 test:
 	cd tester && go test -race ./...
@@ -84,7 +84,7 @@ lint:
 
 clean:
 	rm -rf build
-	rm /tmp/frulab.db
+	rm /tmp/frunami.db
 
 docker:
 	./docker/build_image.sh

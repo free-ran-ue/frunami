@@ -190,7 +190,7 @@ func (a Allocation) Check(allowed Set) (cp, dp Set, errs []FieldError) {
 			return nil
 		}
 		if bad := s.Minus(allowed); len(bad) > 0 {
-			errs = append(errs, FieldError{field, fmt.Sprintf("CPU %s not available to fru-tester (it may use %s)", bad, allowed)})
+			errs = append(errs, FieldError{field, fmt.Sprintf("CPU %s not available to frunami-tester (it may use %s)", bad, allowed)})
 		}
 		return s
 	}

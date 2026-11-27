@@ -16,13 +16,13 @@ import (
 	"github.com/vishvananda/netns"
 )
 
-// These tests need root: set FRU_TESTER_NETNS=1 and run with sudo. They
+// These tests need root: set FRUNAMI_TESTER_NETNS=1 and run with sudo. They
 // build a veth pair, frx-host here and frx-peer in namespace frx-ns:
 // 10.98.0.1/24 here, 10.98.0.2/24 there.
 func vethPair(t *testing.T) (ifindex int) {
 	t.Helper()
-	if os.Getenv("FRU_TESTER_NETNS") == "" {
-		t.Skip("set FRU_TESTER_NETNS=1 and run as root")
+	if os.Getenv("FRUNAMI_TESTER_NETNS") == "" {
+		t.Skip("set FRUNAMI_TESTER_NETNS=1 and run as root")
 	}
 	t.Cleanup(func() {
 		_ = exec.Command("ip", "link", "del", "frx-host").Run()

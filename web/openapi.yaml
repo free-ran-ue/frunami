@@ -830,7 +830,7 @@ paths:
   /api/tester/profile/validate:
     post:
       summary: Validate a profile and preview the per-gNB plan
-      description: Forwarded to fru-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
+      description: Forwarded to frunami-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
       operationId: testerProfileValidate
       security:
         - bearerAuth: []
@@ -848,7 +848,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TesterValidateResponse'
         '502':
-          description: fru-tester is unreachable
+          description: frunami-tester is unreachable
           content:
             application/json:
               schema:
@@ -863,7 +863,7 @@ paths:
   /api/tester/run:
     get:
       summary: Current run snapshot
-      description: Forwarded to fru-tester. State is `idle` before the first run.
+      description: Forwarded to frunami-tester. State is `idle` before the first run.
       operationId: testerRunGet
       security:
         - bearerAuth: []
@@ -879,7 +879,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TesterRunSnapshot'
         '502':
-          description: fru-tester is unreachable
+          description: frunami-tester is unreachable
           content:
             application/json:
               schema:
@@ -892,7 +892,7 @@ paths:
                 $ref: '#/components/schemas/MessageResponse'
     post:
       summary: Start a run
-      description: Forwarded to fru-tester. Only one run may be active at a time.
+      description: Forwarded to frunami-tester. Only one run may be active at a time.
       operationId: testerRunStart
       security:
         - bearerAuth: []
@@ -922,7 +922,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: fru-tester is unreachable
+          description: frunami-tester is unreachable
           content:
             application/json:
               schema:
@@ -937,7 +937,7 @@ paths:
   /api/tester/run/stop:
     post:
       summary: Stop the active run
-      description: Stops the traffic, deregisters every registered UE, closes every N2 association and removes what fru-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
+      description: Stops the traffic, deregisters every registered UE, closes every N2 association and removes what frunami-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
       operationId: testerRunStop
       security:
         - bearerAuth: []
@@ -956,8 +956,8 @@ paths:
                 $ref: '#/components/schemas/MessageResponse'
   /api/tester/network/interfaces:
     get:
-      summary: Interfaces on fru-tester's host
-      description: Forwarded to fru-tester. Every link on the host where fru-tester runs, for the Setup page's interface menus.
+      summary: Interfaces on frunami-tester's host
+      description: Forwarded to frunami-tester. Every link on the host where frunami-tester runs, for the Setup page's interface menus.
       operationId: testerNetworkInterfaces
       security:
         - bearerAuth: []
@@ -971,7 +971,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/TesterInterface'
         '502':
-          description: fru-tester is unreachable
+          description: frunami-tester is unreachable
           content:
             application/json:
               schema:
@@ -985,7 +985,7 @@ paths:
   /api/tester/network/ping:
     post:
       summary: Ping test of one network
-      description: Forwarded to fru-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR's prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF's N3 or the UPF's N6 three times, and removes the address again. Only that network's fields are checked. Not while a run is active.
+      description: Forwarded to frunami-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR's prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF's N3 or the UPF's N6 three times, and removes the address again. Only that network's fields are checked. Not while a run is active.
       operationId: testerNetworkPing
       security:
         - bearerAuth: []
@@ -1017,7 +1017,7 @@ paths:
   /api/tester/bench:
     get:
       summary: Latest data plane bench
-      description: Forwarded to fru-tester. State is `idle` before the first bench.
+      description: Forwarded to frunami-tester. State is `idle` before the first bench.
       operationId: testerBenchGet
       security:
         - bearerAuth: []
@@ -1030,7 +1030,7 @@ paths:
                 $ref: '#/components/schemas/TesterBenchResult'
     post:
       summary: Start a data plane bench
-      description: Measures how fast this host's fru-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
+      description: Measures how fast this host's frunami-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
       operationId: testerBenchStart
       security:
         - bearerAuth: []
@@ -1062,7 +1062,7 @@ paths:
   /api/tester/system:
     get:
       summary: The tester host's CPU allocation and layout (Status page)
-      description: Forwarded to fru-tester. cpus is what the next run uses; topology helps choose it.
+      description: Forwarded to frunami-tester. cpus is what the next run uses; topology helps choose it.
       operationId: testerSystemGet
       security:
         - bearerAuth: []
@@ -1076,7 +1076,7 @@ paths:
   /api/tester/system/cpuload:
     get:
       summary: How busy each CPU of the tester host is (Status page)
-      description: Forwarded to fru-tester, which reads /proc/stat. The whole host's load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
+      description: Forwarded to frunami-tester, which reads /proc/stat. The whole host's load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
       operationId: testerSystemCpuLoad
       security:
         - bearerAuth: []
@@ -1090,7 +1090,7 @@ paths:
   /api/tester/status:
     get:
       summary: The tester host and process (Status page)
-      description: Forwarded to fru-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when fru-tester runs in a container), load average and the capabilities a run needs. A 502 means fru-lab could not reach fru-tester.
+      description: Forwarded to frunami-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when frunami-tester runs in a container), load average and the capabilities a run needs. A 502 means frunami could not reach frunami-tester.
       operationId: testerStatusGet
       security:
         - bearerAuth: []
@@ -1102,7 +1102,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TesterStatus'
         '502':
-          description: fru-tester is unreachable or rejected fru-lab's API token
+          description: frunami-tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1110,7 +1110,7 @@ paths:
   /api/tester/system/cpus:
     put:
       summary: Set the CPU allocation for the next runs
-      description: Forwarded to fru-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
+      description: Forwarded to frunami-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
       operationId: testerSystemCpusPut
       security:
         - bearerAuth: []
@@ -1141,7 +1141,7 @@ paths:
                 $ref: '#/components/schemas/MessageResponse'
   /api/testers:
     get:
-      summary: Every tester fru-lab can reach (Status page)
+      summary: Every tester frunami can reach (Status page)
       description: The tester in config.yaml (backend.tester, id "default", builtIn) first, then the ones added here. API tokens are never returned; each tester's name comes from its own status.
       operationId: testersList
       security:
@@ -1157,7 +1157,7 @@ paths:
                   $ref: '#/components/schemas/TesterEntry'
     post:
       summary: Add a tester
-      description: fru-lab first asks the tester for its /api/status with the token; it is kept only if it answers.
+      description: frunami first asks the tester for its /api/status with the token; it is kept only if it answers.
       operationId: testersAdd
       security:
         - bearerAuth: []
@@ -1183,7 +1183,7 @@ paths:
   /api/testers/{id}:
     delete:
       summary: Remove an added tester
-      description: Only fru-lab forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
+      description: Only frunami forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
       operationId: testersDelete
       security:
         - bearerAuth: []
@@ -1231,7 +1231,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1262,7 +1262,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1307,7 +1307,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1341,7 +1341,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1375,7 +1375,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1405,7 +1405,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1451,7 +1451,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1479,7 +1479,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1524,7 +1524,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1552,7 +1552,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1580,7 +1580,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1614,7 +1614,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '502':
-          description: The tester is unreachable or rejected fru-lab's API token
+          description: The tester is unreachable or rejected frunami's API token
           content:
             application/json:
               schema:
@@ -1622,7 +1622,7 @@ paths:
   /api/tester/history:
     get:
       summary: Finished runs, newest first
-      description: fru-lab keeps the last 50 runs fru-tester finished.
+      description: frunami keeps the last 50 runs frunami-tester finished.
       operationId: testerHistoryList
       security:
         - bearerAuth: []
@@ -1637,7 +1637,7 @@ paths:
                   $ref: '#/components/schemas/TesterHistorySummary'
     delete:
       summary: Delete finished runs from the history
-      description: fru-lab remembers the deleted runs, so a tester that still keeps one does not bring it back.
+      description: frunami remembers the deleted runs, so a tester that still keeps one does not bring it back.
       operationId: testerHistoryDelete
       security:
         - bearerAuth: []
@@ -2064,7 +2064,7 @@ components:
           example: 1000 UE baseline
         testerId:
           type: string
-          description: Which tester (GET /api/testers) runs this profile; absent means "default", the one in config.yaml. Only fru-lab reads it; leave it out of what is sent to a tester, which rejects fields it does not know.
+          description: Which tester (GET /api/testers) runs this profile; absent means "default", the one in config.yaml. Only frunami reads it; leave it out of what is sent to a tester, which rejects fields it does not know.
           example: default
         scale:
           type: object
@@ -2078,7 +2078,7 @@ components:
               example: 1000
             throughputUeCount:
               type: integer
-              description: How many UEs, the first ones, establish a PDU session and carry traffic (0..ueCount). The rest are the control-plane test - they register and deregister in a loop (rates.cpLoop) once every throughput UE is done. fru-tester treats an absent value as ueCount.
+              description: How many UEs, the first ones, establish a PDU session and carry traffic (0..ueCount). The rest are the control-plane test - they register and deregister in a loop (rates.cpLoop) once every throughput UE is done. frunami-tester treats an absent value as ueCount.
               example: 1000
         gnb:
           type: object
@@ -2544,7 +2544,7 @@ components:
           type: string
         version:
           type: string
-          description: VCS revision fru-tester was built from; empty when the build does not say.
+          description: VCS revision frunami-tester was built from; empty when the build does not say.
         goVersion:
           type: string
         kernel:
@@ -2572,7 +2572,7 @@ components:
             processRss:
               type: integer
               format: int64
-              description: fru-tester's resident memory.
+              description: frunami-tester's resident memory.
             goHeap:
               type: integer
               format: int64
@@ -2580,7 +2580,7 @@ components:
               type: integer
               format: int64
               nullable: true
-              description: Memory limit of fru-tester's cgroup (its container); null when there is none.
+              description: Memory limit of frunami-tester's cgroup (its container); null when there is none.
             cgroupUsage:
               type: integer
               format: int64
@@ -2594,7 +2594,7 @@ components:
               type: integer
             allowed:
               type: integer
-              description: CPUs fru-tester may use.
+              description: CPUs frunami-tester may use.
             load1:
               type: number
             load5:
@@ -2648,7 +2648,7 @@ components:
           description: CPUs the kernel runs.
         allowed:
           type: string
-          description: Of those, the CPUs fru-tester may use (in a container, its cpuset).
+          description: Of those, the CPUs frunami-tester may use (in a container, its cpuset).
         nodes:
           type: array
           items:

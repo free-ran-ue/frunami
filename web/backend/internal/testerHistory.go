@@ -18,13 +18,13 @@ import (
 	"backend/model"
 )
 
-// testerHistoryKeep is how many finished runs fru-lab keeps (design N7).
+// testerHistoryKeep is how many finished runs frunami keeps (design N7).
 const testerHistoryKeep = 50
 
-// testerHistoryPoll is how often fru-lab asks fru-tester for a finished run.
+// testerHistoryPoll is how often frunami asks frunami-tester for a finished run.
 const testerHistoryPoll = 3 * time.Second
 
-// testerRunStore is the slice of fru-lab's DB the history uses.
+// testerRunStore is the slice of frunami's DB the history uses.
 type testerRunStore interface {
 	SaveTesterRun(runID string, report []byte, keep int) (bool, error)
 	ListTesterRuns() ([]flctx.KV, error)
@@ -38,7 +38,7 @@ type testerRunStore interface {
 const testerRunNameMax = 80
 
 // testerHistoryWatcher copies each finished run from every tester into
-// fru-lab's DB. A tester keeps its last few finished runs; fru-lab polls
+// frunami's DB. A tester keeps its last few finished runs; frunami polls
 // them and stores every one it has not seen yet, noting which tester ran
 // it.
 type testerHistoryWatcher struct {
@@ -59,7 +59,7 @@ func historyKey(testerID, runID string) string {
 	return runID + "@" + testerID
 }
 
-// storedTester is which tester ran a stored run; fru-lab adds it to the
+// storedTester is which tester ran a stored run; frunami adds it to the
 // report it stores.
 type storedTester struct {
 	ID   string `json:"id"`
@@ -224,7 +224,7 @@ type storedDirection struct {
 	LossRate float64 `json:"lossRate"`
 }
 
-// storedReport is the part of fru-tester's report the history reads.
+// storedReport is the part of frunami-tester's report the history reads.
 type storedReport struct {
 	Tester   *storedTester `json:"tester"` // absent: the default tester, stored before testers could be added
 	Name     string        `json:"name"`   // set by renaming the run in the history

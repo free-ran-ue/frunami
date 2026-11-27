@@ -8,7 +8,7 @@ COPY web/backend/go.mod web/backend/go.sum ./
 RUN go mod download
 
 COPY web/backend/ .
-RUN go build -o /out/fru-lab .
+RUN go build -o /out/frunami .
 
 # -------------------------------
 # Stage 2: Build the frontend
@@ -23,10 +23,10 @@ RUN yarn install && yarn build
 # Stage 3: Build the final image
 # -------------------------------
 FROM debian:bookworm-slim
-WORKDIR /frulab
+WORKDIR /frunami
 
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /out/fru-lab ./fru-lab
+COPY --from=builder /out/frunami ./frunami
 COPY --from=frontendbuilder /src/frontend/dist ./frontend

@@ -19,7 +19,7 @@ import (
 
 // fakeUPF stands in for a UPF on loopback: uplink G-PDUs arriving on its
 // N3 are decapsulated and forwarded to the sink from its own address (as
-// fru-lab's masquerading UPF does); downlink UDP arriving on its "N6" is
+// frunami's masquerading UPF does); downlink UDP arriving on its "N6" is
 // wrapped in a G-PDU with a PDU Session Container (as gtp5g does) and sent
 // to the UE's gNB. dropEvery > 0 drops every n-th downlink packet.
 type fakeUPF struct {
@@ -491,7 +491,7 @@ func TestDownlinkBatchSendsEachUEARunOfPackets(t *testing.T) {
 // way because a receive buffer was full; then it stops e.
 //
 // Tests run without CAP_NET_ADMIN, so their sockets keep net.core.rmem_max
-// (often 208 KB) where fru-tester forces 8 MB. Under -race on a CI runner
+// (often 208 KB) where frunami-tester forces 8 MB. Under -race on a CI runner
 // with few CPUs, the fake UPF (one goroutine per direction) and the
 // engine's readers fall behind a burst, and a GSO send puts a whole burst
 // into a queue at once, so the kernel drops what does not fit. That is

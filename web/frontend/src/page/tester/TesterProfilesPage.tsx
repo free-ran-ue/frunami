@@ -16,9 +16,9 @@ import styles from './profiles.module.css'
 // PROFILES_PAGE is how many profiles one page of the list shows.
 const PROFILES_PAGE = 20
 
-// TESTER_COLORS tell testers apart: the first one is the accent, the
-// second violet, as in the prototype; more cycle through the brand tones.
-const TESTER_COLORS = ['var(--accent)', 'var(--violet)', 'var(--brand-1)', 'var(--brand-3)', 'var(--ok)', 'var(--warn)']
+// TESTER_COLORS tell testers apart: the first one is the accent,
+// then the brand chart series (CLAUDE.md §1.6), then status colours.
+const TESTER_COLORS = ['var(--accent)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--ok)', 'var(--warn)']
 
 // testerColor is a tester's square colour, by its place in the list.
 function testerColor(testers: TesterOption[] | null, id: string): string {

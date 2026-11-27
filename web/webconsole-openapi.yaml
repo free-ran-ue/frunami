@@ -2,7 +2,7 @@
 # Copied from free5gc webconsole's own frontend/webconsole.yaml (schemas are
 # theirs, verbatim) and extended with the subscriber CRUD + login paths their
 # spec doesn't define yet, cross-checked against the real handlers in
-# webconsole/backend/WebUI/api_webui.go so fru-lab can generate a typed
+# webconsole/backend/WebUI/api_webui.go so frunami can generate a typed
 # client against the actual API instead of hand-writing the (large) request
 # types.
 openapi: 3.0.0

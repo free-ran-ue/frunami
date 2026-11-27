@@ -6,7 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **online** | **string** | CPUs the kernel runs. | [default to undefined]
-**allowed** | **string** | Of those, the CPUs fru-tester may use (in a container, its cpuset). | [default to undefined]
+**allowed** | **string** | Of those, the CPUs frunami-tester may use (in a container, its cpuset). | [default to undefined]
 **nodes** | [**Array&lt;TesterNumaNode&gt;**](TesterNumaNode.md) |  | [default to undefined]
 **interfaces** | [**Array&lt;TesterNicLayout&gt;**](TesterNicLayout.md) | Physical NICs only. | [default to undefined]
 

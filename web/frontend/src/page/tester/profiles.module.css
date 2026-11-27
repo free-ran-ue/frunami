@@ -16,7 +16,7 @@
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .btnPrimary { border-color: var(--accent); background: var(--accent); color: var(--surface); }
 .btnPrimary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); color: var(--surface); }
-.btnDanger { border-color: var(--bad); background: var(--bad); color: var(--surface); }
+.btnDanger { border-color: var(--bad-ink); background: var(--bad-ink); color: var(--surface); }
 .btnDanger:hover:not(:disabled) { background: var(--bad-ink); border-color: var(--bad-ink); color: var(--surface); }
 .btn svg { width: 0.875rem; height: 0.875rem; flex: none; }
 
@@ -72,7 +72,7 @@
 }
 .link:hover { color: var(--accent-ink); }
 .link:disabled { color: var(--muted); cursor: not-allowed; }
-.linkDanger { color: var(--bad); }
+.linkDanger { color: var(--bad-ink); }
 .linkDanger:hover { color: var(--bad-ink); }
 .sep { color: var(--border-strong); padding: 0 0.5rem; }
 

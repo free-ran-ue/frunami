@@ -71,6 +71,6 @@ func poke(dst netip.Addr) {
 	if err != nil {
 		return
 	}
-	_, _ = c.Write([]byte("fru-tester"))
+	_, _ = c.Write([]byte("frunami-tester"))
 	_ = c.Close()
 }

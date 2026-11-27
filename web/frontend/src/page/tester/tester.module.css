@@ -23,7 +23,7 @@
 }
 .input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
 .input:disabled { background: var(--surface-sunken); color: var(--muted); cursor: not-allowed; }
-.inputError, .inputError:focus { border-color: var(--bad); outline-color: var(--bad); }
+.inputError, .inputError:focus { border-color: var(--bad-ink); outline-color: var(--bad-ink); }
 .fieldError { margin: 0; color: var(--bad-ink); font-size: 0.75rem; font-weight: 500; }
 .fieldHint { margin: 0; color: var(--muted); font-size: 0.75rem; }
 
@@ -38,7 +38,7 @@
 .legend i, .chartTip i { display: inline-block; width: 0.875rem; height: 2px; border-radius: 1px; margin-right: 0.375rem; vertical-align: middle; }
 .swatchRx { background: var(--accent); }
 
-.swatchDereg { background: repeating-linear-gradient(90deg, var(--violet) 0 0.25rem, transparent 0.25rem 0.4375rem); }
+.swatchDereg { background: repeating-linear-gradient(90deg, var(--chart-2) 0 0.25rem, transparent 0.25rem 0.4375rem); }
 .swatchFail { background: var(--bad); }
 .chartBox { position: relative; width: 100%; height: 9.375rem; }
 .chartEmpty {
@@ -52,7 +52,7 @@
  .lineRx { fill: none; stroke-linejoin: round; }
 .lineRx { stroke: var(--accent); stroke-width: 2; }
 
-.lineDereg { fill: none; stroke: var(--violet); stroke-width: 1.5; stroke-dasharray: 4 3; stroke-linejoin: round; }
+.lineDereg { fill: none; stroke: var(--chart-2); stroke-width: 1.5; stroke-dasharray: 4 3; stroke-linejoin: round; }
 .lineFail { fill: none; stroke: var(--bad); stroke-width: 1.5; stroke-linejoin: round; }
 
 .chartTip {
@@ -79,10 +79,10 @@
 }
 .cpu:hover:not(:disabled) { border-color: var(--accent); }
 .cpu:disabled { cursor: default; }
-/* control plane: violet; data plane: accent */
+/* control plane: chart-2 (teal); data plane: accent (blue) */
 .cpuCp {
-  background: color-mix(in srgb, var(--violet) 14%, var(--surface));
-  border-color: var(--violet); color: color-mix(in srgb, var(--violet) 45%, var(--ink)); font-weight: 600;
+  background: color-mix(in srgb, var(--chart-2) 14%, var(--surface));
+  border-color: var(--chart-2); color: color-mix(in srgb, var(--chart-2) 45%, var(--ink)); font-weight: 600;
 }
 .cpuDp { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
 .cpuOff {
@@ -97,7 +97,7 @@
 .cpuIrqKey { display: inline-block; width: 0.375rem; height: 0.375rem; border-radius: 50%; background: var(--ink); vertical-align: 1px; margin-right: 0.375rem; }
 .legend i.cpuSwatch { width: 0.75rem; height: 0.75rem; border-radius: 0.1875rem; vertical-align: -2px; }
 .legend i.cpuIrqKey { width: 0.375rem; height: 0.375rem; border-radius: 50%; vertical-align: 1px; }
-.legend i.cpuSwatch.cpuCp { background: color-mix(in srgb, var(--violet) 14%, var(--surface)); border-color: var(--violet); }
+.legend i.cpuSwatch.cpuCp { background: color-mix(in srgb, var(--chart-2) 14%, var(--surface)); border-color: var(--chart-2); }
 .legend i.cpuSwatch.cpuDp { background: var(--accent-soft); border-color: var(--accent); }
 .legend i.cpuSwatch.cpuOff { background: repeating-linear-gradient(45deg, var(--surface-muted) 0 0.1875rem, var(--border-soft) 0.1875rem 0.375rem); }
 .cpuWarn {
@@ -211,7 +211,7 @@
 .kpiBig { font-size: 1.75rem; font-weight: 500; letter-spacing: -0.02em; color: var(--ink); line-height: 1.2; }
 .kpiUnit { font-size: 0.8125rem; color: var(--muted); }
 .kpiSub { font-size: 0.75rem; color: var(--muted); }
-.kpiSubBad { color: var(--bad); }
+.kpiSubBad { color: var(--bad-ink); }
 
 /* ---------- cards (Testers, Runs) ---------- */
 .cardGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(21.25rem, 100%), 1fr)); gap: 1.25rem; }
@@ -231,7 +231,7 @@
 .tcardHead > .state { margin-left: auto; }
 .tcardBody { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.875rem; }
 .tcardDown { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.375rem; font-size: 0.8125rem; }
-.tcardDown > :first-child { color: var(--bad); font-weight: 500; }
+.tcardDown > :first-child { color: var(--bad-ink); font-weight: 500; }
 .tcardDown > :last-child { color: var(--muted); overflow-wrap: anywhere; }
 .tcardWait { padding: 1rem 1.25rem; font-size: 0.8125rem; color: var(--muted); }
 .tcardFoot {
@@ -245,7 +245,7 @@
 .openLink svg { width: 0.75rem; height: 0.75rem; }
 .removeLink {
   background: none; border: 0; padding: 0; font: inherit; font-size: 0.75rem; font-weight: 500;
-  color: var(--bad); cursor: pointer; white-space: nowrap;
+  color: var(--bad-ink); cursor: pointer; white-space: nowrap;
 }
 .removeLink:hover { color: var(--bad-ink); text-decoration: underline; }
 .removeLink + .openLink { margin-left: 1rem; }
@@ -300,8 +300,8 @@
 .legendKey { display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.75rem; color: var(--muted); }
 .legendKey > i { display: inline-block; width: 0.875rem; height: 2px; }
 .keyDl { background: var(--accent); }
-.keyUl { background: var(--violet); }
-.keyDereg { background: var(--violet); }
+.keyUl { background: var(--chart-2); }
+.keyDereg { background: var(--chart-2); }
 .keyFail { background: var(--bad); }
 .wideChart { position: relative; width: 100%; }
 .wideChartEmpty {
@@ -311,9 +311,9 @@
 .axisLine { stroke: var(--border-strong); stroke-width: 1; }
 .lineDl, .lineUl { fill: none; stroke-width: 2; stroke-linejoin: round; }
 .lineDl { stroke: var(--accent); }
-.lineUl { stroke: var(--violet); }
+.lineUl { stroke: var(--chart-2); }
 .dotDl { fill: var(--accent); }
-.dotUl { fill: var(--violet); }
+.dotUl { fill: var(--chart-2); }
 .lineTx { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 5 4; stroke-linejoin: round; }
 .dotTx { fill: var(--muted); }
 .keyTx { background: repeating-linear-gradient(90deg, var(--muted) 0 0.25rem, transparent 0.25rem 0.4375rem); }
@@ -337,7 +337,7 @@
 .procTable th:first-child, .procTable td:first-child { text-align: left; }
 .procTable td:first-child { font-family: var(--font-sans); font-weight: 500; }
 .procTable tbody tr:last-child td, .dataTable tbody tr:last-child td { border-bottom: 0; }
-.tdBad { color: var(--bad) !important; }
+.tdBad { color: var(--bad-ink) !important; }
 
 .tdWrap { white-space: normal !important; min-width: 16rem; font-family: var(--font-sans) !important; font-size: 0.75rem !important; color: var(--muted) !important; text-align: left !important; }
 

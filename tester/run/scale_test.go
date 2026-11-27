@@ -16,14 +16,14 @@ import (
 
 // TestScale runs gNBs and UEs against the in-process fake AMF and reports
 // memory, goroutines and the snapshot's size. Not a pass/fail test:
-// FRU_TESTER_SCALE=<ues> go test ./run -run TestScale -v -timeout 2h
+// FRUNAMI_TESTER_SCALE=<ues> go test ./run -run TestScale -v -timeout 2h
 func TestScale(t *testing.T) {
-	ues, _ := strconv.Atoi(os.Getenv("FRU_TESTER_SCALE"))
+	ues, _ := strconv.Atoi(os.Getenv("FRUNAMI_TESTER_SCALE"))
 	if ues == 0 {
-		t.Skip("set FRU_TESTER_SCALE=<UE count>")
+		t.Skip("set FRUNAMI_TESTER_SCALE=<UE count>")
 	}
 	gnbs := 10000
-	if v, _ := strconv.Atoi(os.Getenv("FRU_TESTER_SCALE_GNBS")); v > 0 {
+	if v, _ := strconv.Atoi(os.Getenv("FRUNAMI_TESTER_SCALE_GNBS")); v > 0 {
 		gnbs = v
 	}
 	amf := newFakeAMF(nil)
@@ -72,7 +72,7 @@ func TestScale(t *testing.T) {
 		time.Sleep(200 * time.Millisecond)
 	}
 	report("all established", start)
-	if path := os.Getenv("FRU_TESTER_SCALE_HEAP"); path != "" {
+	if path := os.Getenv("FRUNAMI_TESTER_SCALE_HEAP"); path != "" {
 		f, err := os.Create(path)
 		require.NoError(t, err)
 		require.NoError(t, pprof.WriteHeapProfile(f))
