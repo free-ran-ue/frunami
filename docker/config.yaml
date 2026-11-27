@@ -1,0 +1,36 @@
+backend:
+  username: "admin"
+  password: "frulab"
+
+  port: 8888
+
+  jwt:
+    secret: "fru-lab"
+    expiresIn: 24h
+
+  db:
+    type: "bbolt"
+    path: "./db/frulab.db"
+
+  deploy:
+    # must stay an identical path on the host and in this container - see
+    # the comment on this same mount in docker-compose.yaml.
+    workDir: "/var/lib/frulab/deploy"
+    # a deploy that fails or takes longer than this is taken down again
+    timeout: 5m
+    webconsole:
+      # host port free5GC's webconsole is published on; change it if 5000
+      # is taken on this host (the browser reaches it through fru-lab)
+      port: 5000
+      # fru-lab runs in a container: the webconsole is on the host
+      host: "host.docker.internal"
+
+  frontendFilePath: "frontend"
+
+  tester:
+    # fru-tester runs on the host network (see docker-compose.yaml)
+    url: "http://host.docker.internal:9100"
+    apiToken: "frulab-tester"
+
+logger:
+  level: "info"

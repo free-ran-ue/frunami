@@ -1,0 +1,821 @@
+package context
+
+import (
+	"backend/constant"
+	"backend/logger"
+	"backend/model"
+	"context"
+	"embed"
+	"errors"
+	"fmt"
+	"io/fs"
+	"net/netip"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
+	"sync"
+	"text/template"
+	"time"
+
+	"github.com/compose-spec/compose-go/v2/loader"
+	"github.com/compose-spec/compose-go/v2/types"
+	"github.com/docker/cli/cli/command"
+	cliflags "github.com/docker/cli/cli/flags"
+	"github.com/docker/compose/v5/pkg/api"
+	"github.com/docker/compose/v5/pkg/compose"
+	dockernetwork "github.com/moby/moby/api/types/network"
+	dockerclient "github.com/moby/moby/client"
+)
+
+// composeTemplate is one materializable template: where it lives in the
+// embedded fs.
+type composeTemplate struct {
+	templateFS  embed.FS
+	templateDir string
+}
+
+// composeTarget describes one deployable docker compose stack: its default
+// template and what compose project name to use when driving it through the
+// Docker Engine API. Most targets only ever have one template; free5gc is
+// the exception, with a named variant per entry in variants (see
+// DeployUp/Up's templateVariant parameter).
+type composeTarget struct {
+	projectName string
+	composeTemplate
+	variants map[string]composeTemplate
+}
+
+// template resolves which template to materialize for a deploy: the named
+// variant if the target has one by that name, otherwise the target's
+// default. An unknown/empty variant silently falls back to the default
+// rather than erroring, since most targets (gnb, and free5gc's own
+// Down/Status/Logs calls) never pass one at all.
+func (t composeTarget) template(variant string) composeTemplate {
+	if variant != "" {
+		if v, ok := t.variants[variant]; ok {
+			return v
+		}
+	}
+	return t.composeTemplate
+}
+
+// sharedNetwork describes a docker network that is not owned by any single
+// target's lifecycle (e.g. cn-ran, shared between free5gc and free-ran-ue).
+type sharedNetwork struct {
+	name       string
+	subnet     string
+	bridgeName string
+}
+
+type composeContextIE struct {
+	WorkDir string
+	// WebconsolePort is the host port free5GC's webconsole is published on.
+	WebconsolePort int
+	// DeployTimeout bounds one deploy; a deploy that fails or runs over is
+	// taken down again.
+	DeployTimeout time.Duration
+
+	*logger.BackendLogger
+}
+
+type composeContext struct {
+	dockerCli command.Cli
+	service   api.Compose
+
+	workDir        string
+	webconsolePort int
+	deployTimeout  time.Duration
+	targets        map[string]composeTarget
+	sharedNetworks []sharedNetwork
+
+	// guards the materialize-then-load sequence in loadProject: Up() writes
+	// the template's files to workDir while docker is bind-mounting them
+	// into new containers, so a concurrent status/logs poll must never be
+	// allowed to wipe and rewrite the same files mid-mount (see loadProject).
+	materializeMu sync.Mutex
+
+	// networksReady is set once the shared networks exist; without a
+	// Docker daemon at startup, the first deploy creates them.
+	networksMu    sync.Mutex
+	networksReady bool
+
+	*logger.BackendLogger
+}
+
+func newComposeContext(ie *composeContextIE) (*composeContext, error) {
+	dockerCli, err := command.NewDockerCli()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create docker cli: %v", err)
+	}
+	if err := dockerCli.Initialize(cliflags.NewClientOptions()); err != nil {
+		return nil, fmt.Errorf("failed to initialize docker cli: %v", err)
+	}
+
+	service, err := compose.NewComposeService(dockerCli)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create compose service: %v", err)
+	}
+
+	c := &composeContext{
+		dockerCli: dockerCli,
+		service:   service,
+
+		workDir:        ie.WorkDir,
+		webconsolePort: ie.WebconsolePort,
+		deployTimeout:  ie.DeployTimeout,
+		targets:        defaultTargets(),
+		sharedNetworks: []sharedNetwork{
+			// free5gc (amf/upf) <-> gnb
+			{name: "frulab-cn-ran", subnet: "10.0.1.0/24", bridgeName: "docker-cn-ran"},
+			// gnb <-> ue (ue isn't a deploy target yet, but the network is
+			// shared infrastructure independent of either target's lifecycle,
+			// same reasoning as cn-ran, so it's created up front too)
+			{name: "frulab-ran-ue", subnet: "10.0.2.0/24", bridgeName: "docker-ran-ue"},
+		},
+
+		BackendLogger: ie.BackendLogger,
+	}
+
+	// fru-lab also runs without a Docker daemon (in Kubernetes, to drive
+	// the throughput tester only): then the deploy pages fail with the
+	// daemon's error, and the networks are created on the next deploy.
+	if err := c.networks(context.Background()); err != nil {
+		c.CtxLog.Warnf("Docker is not reachable, deploying free5GC/gNB/UE will fail until it is: %v", err)
+	}
+
+	return c, nil
+}
+
+// defaultTargets are the deployable compose stacks and their templates.
+func defaultTargets() map[string]composeTarget {
+	return map[string]composeTarget{
+		constant.DEPLOY_TARGET_FREE5GC: {
+			projectName: "frulab-free5gc",
+			composeTemplate: composeTemplate{
+				templateFS:  free5gcTemplateFS,
+				templateDir: "templates/free5gc",
+			},
+			variants: map[string]composeTemplate{
+				constant.FREE5GC_TEMPLATE_BASIC: {
+					templateFS:  free5gcTemplateFS,
+					templateDir: "templates/free5gc",
+				},
+				constant.FREE5GC_TEMPLATE_ULCL: {
+					templateFS:  free5gcUlclTemplateFS,
+					templateDir: "templates/free5gc-ulcl",
+				},
+				constant.FREE5GC_TEMPLATE_ULCL_2SLICE: {
+					templateFS:  free5gcUlcl2SliceTemplateFS,
+					templateDir: "templates/free5gc-ulcl-2slice",
+				},
+			},
+		},
+		constant.DEPLOY_TARGET_GNB: {
+			projectName: "frulab-gnb",
+			composeTemplate: composeTemplate{
+				templateFS:  gnbTemplateFS,
+				templateDir: "templates/gnb",
+			},
+		},
+		// gnb-slice1/gnb-slice2 are independent targets (own compose
+		// project, own container, own cn-ran/ran-ue IPs) rather than
+		// variants of gnb, since under FREE5GC_TEMPLATE_ULCL_2SLICE both
+		// need to be deployable at the same time.
+		constant.DEPLOY_TARGET_GNB_SLICE1: {
+			projectName: "frulab-gnb-slice1",
+			composeTemplate: composeTemplate{
+				templateFS:  gnbSlice1TemplateFS,
+				templateDir: "templates/gnb-slice1",
+			},
+		},
+		constant.DEPLOY_TARGET_GNB_SLICE2: {
+			projectName: "frulab-gnb-slice2",
+			composeTemplate: composeTemplate{
+				templateFS:  gnbSlice2TemplateFS,
+				templateDir: "templates/gnb-slice2",
+			},
+		},
+	}
+}
+
+// networks creates the shared networks unless that was already done.
+func (c *composeContext) networks(ctx context.Context) error {
+	c.networksMu.Lock()
+	defer c.networksMu.Unlock()
+	if c.networksReady {
+		return nil
+	}
+	if err := c.ensureSharedNetworks(ctx); err != nil {
+		return err
+	}
+	c.networksReady = true
+	return nil
+}
+
+func (c *composeContext) ensureSharedNetworks(ctx context.Context) error {
+	apiClient := c.dockerCli.Client()
+
+	for _, n := range c.sharedNetworks {
+		if _, err := apiClient.NetworkInspect(ctx, n.name, dockerclient.NetworkInspectOptions{}); err == nil {
+			c.CtxLog.Debugf("Shared network %s already exists", n.name)
+			continue
+		}
+
+		subnet, err := netip.ParsePrefix(n.subnet)
+		if err != nil {
+			return fmt.Errorf("invalid subnet %s for network %s: %v", n.subnet, n.name, err)
+		}
+
+		c.CtxLog.Infof("Creating shared network %s (%s)", n.name, n.subnet)
+		if _, err := apiClient.NetworkCreate(ctx, n.name, dockerclient.NetworkCreateOptions{
+			Driver: "bridge",
+			IPAM: &dockernetwork.IPAM{
+				Config: []dockernetwork.IPAMConfig{{Subnet: subnet}},
+			},
+			Options: map[string]string{
+				"com.docker.network.bridge.name": n.bridgeName,
+			},
+		}); err != nil {
+			return fmt.Errorf("failed to create network %s: %v", n.name, err)
+		}
+	}
+
+	return nil
+}
+
+// loadProject parses a target's docker-compose.yaml into a *types.Project,
+// materializing its built-in template onto disk first if forceMaterialize is
+// set or nothing has been materialized yet (docker needs real files on disk
+// for its bind-mounted volumes; the template itself may only ever live in
+// the embedded binary).
+//
+// Every caller - Up, Down, Status, Logs - goes through this, so the
+// materialize-then-read sequence is mutex-guarded: while Up() is deploying,
+// docker is actively bind-mounting these exact files into new containers,
+// and a status/logs poll landing mid-deploy must reuse what's already on
+// disk rather than wipe and rewrite it out from under a running mount
+// (os.CopyFS also refuses to write over files that already exist, so a
+// re-materialize always needs a clean directory first).
+//
+// variant only matters when a (re)materialize actually happens: Down,
+// Status and Logs always pass "" and get the target's default template
+// whenever nothing is materialized yet (an edge case - e.g. polling status
+// before ever deploying - where the choice is arbitrary since nothing is
+// running). Only Up passes a real variant, since it's the only caller that
+// forces a fresh materialize on every call.
+func (c *composeContext) loadProject(ctx context.Context, target string, variant string, forceMaterialize bool) (*types.Project, error) {
+	t, ok := c.targets[target]
+	if !ok {
+		return nil, fmt.Errorf("unsupported deploy target: %s", target)
+	}
+
+	workingDir := filepath.Join(c.workDir, target)
+
+	c.materializeMu.Lock()
+	defer c.materializeMu.Unlock()
+
+	composeFilePath := filepath.Join(workingDir, "docker-compose.yaml")
+	alreadyMaterialized := false
+	if _, err := os.Stat(composeFilePath); err == nil {
+		alreadyMaterialized = true
+	}
+
+	if forceMaterialize || !alreadyMaterialized {
+		if err := os.RemoveAll(workingDir); err != nil {
+			return nil, fmt.Errorf("failed to clean working dir %s: %v", workingDir, err)
+		}
+		if err := os.MkdirAll(workingDir, 0755); err != nil {
+			return nil, fmt.Errorf("failed to create working dir %s: %v", workingDir, err)
+		}
+
+		tmpl := t.template(variant)
+		templateFS, err := fs.Sub(tmpl.templateFS, tmpl.templateDir)
+		if err != nil {
+			return nil, fmt.Errorf("failed to open template for target %s: %v", target, err)
+		}
+		if err := os.CopyFS(workingDir, templateFS); err != nil {
+			return nil, fmt.Errorf("failed to materialize template for target %s: %v", target, err)
+		}
+		// go:embed drops the executable bit (embed.FS always reports a
+		// fixed, non-executable mode), so anything a container runs as a
+		// script needs it restored by hand after materializing.
+		if err := restoreScriptPermissions(workingDir); err != nil {
+			return nil, fmt.Errorf("failed to restore script permissions for target %s: %v", target, err)
+		}
+	}
+
+	project, err := loader.LoadWithContext(ctx, types.ConfigDetails{
+		WorkingDir: workingDir,
+		ConfigFiles: []types.ConfigFile{
+			{Filename: filepath.Join(workingDir, "docker-compose.yaml")},
+		},
+	}, func(o *loader.Options) {
+		o.SetProjectName(t.projectName, true)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to load compose project for target %s: %v", target, err)
+	}
+
+	stampComposeLabels(project)
+	if target == constant.DEPLOY_TARGET_FREE5GC {
+		publishWebconsole(project, c.webconsolePort)
+	}
+
+	return project, nil
+}
+
+// webconsoleService is the free5GC webconsole's service name in every
+// free5gc template; it listens on webconsoleContainerPort.
+const (
+	webconsoleService       = "webconsole"
+	webconsoleContainerPort = 5000
+)
+
+// publishWebconsole publishes only the webconsole's HTTP port, on the host
+// port fru-lab is configured with (deploy.webconsole.port), so a host that
+// already uses 5000 can still deploy. Its FTP ports (2121/2122, CDR upload
+// from the CHF) stay inside the compose network.
+func publishWebconsole(project *types.Project, hostPort int) {
+	service, ok := project.Services[webconsoleService]
+	if !ok {
+		return
+	}
+	service.Ports = []types.ServicePortConfig{{
+		Mode: "ingress", Protocol: "tcp", Target: webconsoleContainerPort, Published: strconv.Itoa(hostPort),
+	}}
+	project.Services[webconsoleService] = service
+}
+
+// stampComposeLabels stamps the standard com.docker.compose.* labels onto
+// every service in project - the loader alone doesn't do this (docker
+// compose's own CLI does it itself after loading, in cmd/compose
+// ProjectOptions.ToProject), so without it the compose engine can't find its
+// own containers again once they're created.
+func stampComposeLabels(project *types.Project) {
+	for name, service := range project.Services {
+		service.CustomLabels = map[string]string{
+			api.ProjectLabel:     project.Name,
+			api.ServiceLabel:     name,
+			api.VersionLabel:     api.ComposeVersion,
+			api.WorkingDirLabel:  project.WorkingDir,
+			api.ConfigFilesLabel: strings.Join(project.ComposeFiles, ","),
+			api.OneoffLabel:      "False",
+		}
+		project.Services[name] = service
+	}
+}
+
+// restoreScriptPermissions makes every *.sh file under dir executable.
+func restoreScriptPermissions(dir string) error {
+	return filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() || filepath.Ext(path) != ".sh" {
+			return nil
+		}
+		return os.Chmod(path, 0755)
+	})
+}
+
+func (c *composeContext) Up(ctx context.Context, target string, templateVariant string) error {
+	project, err := c.loadProject(ctx, target, templateVariant, true)
+	if err != nil {
+		return err
+	}
+
+	c.CtxLog.Infof("Deploying target %s (project %s, template %s)", target, project.Name, templateVariant)
+	return c.up(ctx, project)
+}
+
+// downAfterFailedUpTimeout bounds the cleanup after a failed deploy.
+const downAfterFailedUpTimeout = time.Minute
+
+// up starts project, giving up after deployTimeout. A deploy that fails
+// or runs over is taken down again, so no container is left in "created"
+// (which the dashboard would show as deploying forever), and the error
+// says why it failed.
+func (c *composeContext) up(ctx context.Context, project *types.Project) error {
+	upCtx, cancel := context.WithTimeout(ctx, c.deployTimeout)
+	defer cancel()
+	if err := c.networks(upCtx); err != nil {
+		return fmt.Errorf("failed to ensure shared networks: %v", err)
+	}
+	err := c.service.Up(upCtx, project, api.UpOptions{
+		Create: api.CreateOptions{},
+		Start: api.StartOptions{
+			Project: project,
+		},
+	})
+	if err == nil {
+		return nil
+	}
+	if errors.Is(upCtx.Err(), context.DeadlineExceeded) {
+		err = fmt.Errorf("did not finish within %s", c.deployTimeout)
+	}
+	c.CtxLog.Warnf("Deploy of %s failed, taking it down: %v", project.Name, err)
+	downCtx, cancelDown := context.WithTimeout(context.Background(), downAfterFailedUpTimeout)
+	defer cancelDown()
+	if downErr := c.service.Down(downCtx, project.Name, api.DownOptions{Project: project}); downErr != nil {
+		c.CtxLog.Errorf("Failed to take %s down after the failed deploy: %v", project.Name, downErr)
+	}
+	return explainUpError(err, c.webconsolePort)
+}
+
+// explainUpError adds what to do about the usual cause of a failed deploy:
+// a host port that is already taken.
+func explainUpError(err error, webconsolePort int) error {
+	msg := err.Error()
+	if strings.Contains(msg, "port is already allocated") || strings.Contains(msg, "address already in use") {
+		return fmt.Errorf("%w (a port this deployment publishes is already in use on the host; if it is the webconsole's port %d, set deploy.webconsole.port in config.yaml)", err, webconsolePort)
+	}
+	return err
+}
+
+func (c *composeContext) Down(ctx context.Context, target string) error {
+	project, err := c.loadProject(ctx, target, "", false)
+	if err != nil {
+		return err
+	}
+
+	c.CtxLog.Infof("Stopping target %s (project %s)", target, project.Name)
+	return c.service.Down(ctx, project.Name, api.DownOptions{
+		Project: project,
+	})
+}
+
+type ComposeStatusResult struct {
+	Services     []model.ServiceStatus
+	LastDeployed *time.Time
+}
+
+func (c *composeContext) Status(ctx context.Context, target string) (*ComposeStatusResult, error) {
+	project, err := c.loadProject(ctx, target, "", false)
+	if err != nil {
+		return nil, err
+	}
+
+	summaries, err := c.service.Ps(ctx, project.Name, api.PsOptions{Project: project, All: true})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get status for target %s: %v", target, err)
+	}
+
+	return summariesToStatusResult(summaries), nil
+}
+
+// summariesToStatusResult maps a raw `docker compose ps` result into our own
+// status shape, shared by both the singleton targets (free5gc/gnb) and every
+// per-instance ue deployment.
+func summariesToStatusResult(summaries []api.ContainerSummary) *ComposeStatusResult {
+	result := &ComposeStatusResult{
+		Services: make([]model.ServiceStatus, 0, len(summaries)),
+	}
+
+	var lastCreated int64
+	for _, summary := range summaries {
+		result.Services = append(result.Services, model.ServiceStatus{
+			Name:   summary.Service,
+			Status: mapServiceStatus(string(summary.State), string(summary.Health)),
+		})
+
+		if summary.Created > lastCreated {
+			lastCreated = summary.Created
+		}
+	}
+
+	if lastCreated > 0 {
+		deployedAt := time.Unix(lastCreated, 0)
+		result.LastDeployed = &deployedAt
+	}
+
+	return result
+}
+
+const logTailLines = "200"
+
+// services filters to specific compose services (e.g. just "amf") - nil or
+// empty means every service in the project, matching the previous behavior.
+func (c *composeContext) Logs(ctx context.Context, target string, services []string) ([]string, error) {
+	project, err := c.loadProject(ctx, target, "", false)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.fetchLogs(ctx, project, services)
+}
+
+// fetchLogs is shared by every singleton target and every ue instance.
+func (c *composeContext) fetchLogs(ctx context.Context, project *types.Project, services []string) ([]string, error) {
+	consumer := &lineLogConsumer{}
+	if err := c.service.Logs(ctx, project.Name, consumer, api.LogOptions{
+		Project:  project,
+		Tail:     logTailLines,
+		Services: services,
+	}); err != nil {
+		return nil, fmt.Errorf("failed to get logs for project %s: %v", project.Name, err)
+	}
+
+	return consumer.lines, nil
+}
+
+// ansiEscapeSequence matches ANSI SGR color/style codes (e.g. "\x1b[36m");
+// many of the NFs colorize their own stdout, which renders as garbled
+// control characters once copied verbatim into a plain <div>.
+var ansiEscapeSequence = regexp.MustCompile("\x1b\\[[0-9;]*m")
+
+// lineLogConsumer collects docker compose's per-container log lines into a
+// single, flat slice for the API response; it doesn't stream.
+type lineLogConsumer struct {
+	lines []string
+}
+
+func (l *lineLogConsumer) Log(containerName, message string) {
+	l.lines = append(l.lines, fmt.Sprintf("%-12s| %s", containerName, stripANSI(message)))
+}
+
+func (l *lineLogConsumer) Err(containerName, message string) {
+	l.lines = append(l.lines, fmt.Sprintf("%-12s| [ERR] %s", containerName, stripANSI(message)))
+}
+
+func stripANSI(s string) string {
+	return ansiEscapeSequence.ReplaceAllString(s, "")
+}
+
+func (l *lineLogConsumer) Status(_, _ string) {
+	// container lifecycle status messages (e.g. "Attaching to ..."), not
+	// real container output - nothing to collect
+}
+
+func mapServiceStatus(state, health string) string {
+	switch {
+	case health == "unhealthy":
+		return "unhealthy"
+	case state == "running":
+		return "running"
+	case state == "restarting", state == "created":
+		return "deploying"
+	default:
+		return "stopped"
+	}
+}
+
+func (c *composeContext) release() {
+	c.CtxLog.Infoln("Release composeContext...")
+
+	if err := c.dockerCli.Client().Close(); err != nil {
+		c.CtxLog.Errorf("Failed to close docker client: %v", err)
+	}
+
+	c.CtxLog.Infoln("composeContext released")
+}
+
+// UeInstanceConfig carries the subscriber-derived fields that get templated
+// into one UE instance's uecfg.yaml at deploy time. RanIp is the one
+// exception - it's not subscriber data, it's which gNB this UE should dial,
+// resolved by the processor layer from the subscriber's own Sd (see
+// Processor.resolveUeGnbTarget) since under FREE5GC_TEMPLATE_ULCL_2SLICE
+// more than one gNB can be up at once and only one of them is this UE's.
+type UeInstanceConfig struct {
+	Mcc          string
+	Mnc          string
+	Msin         string
+	PermanentKey string
+	OpValue      string
+	Amf          string
+	Sqn          string
+	Dnn          string
+	Sst          string
+	Sd           string
+	RanIp        string
+}
+
+// ue deployments are multi-instance - one per subscriber - unlike free5gc/gnb
+// which are process-wide singletons, so they can't reuse c.targets (keyed
+// only by target name) or loadProject (which does a static, untemplated
+// file copy). Every ue instance gets its own working directory and compose
+// project name, keyed by instanceID (the subscriber's ueId).
+
+func (c *composeContext) ueWorkingDir(instanceID string) string {
+	return filepath.Join(c.workDir, constant.DEPLOY_TARGET_UE, instanceID)
+}
+
+func (c *composeContext) ueProjectName(instanceID string) string {
+	return "frulab-ue-" + instanceID
+}
+
+// loadUeProject mirrors loadProject's materialize-then-load approach, but
+// renders the ue template's *.tmpl files against cfg instead of copying them
+// verbatim, since every instance needs its own container name/config. cfg is
+// only required (and only used) when forceMaterialize actually needs to
+// write fresh files; Down/Status/Logs pass nil and reuse whatever is already
+// on disk, same reasoning as loadProject.
+func (c *composeContext) loadUeProject(ctx context.Context, instanceID string, cfg *UeInstanceConfig, forceMaterialize bool) (*types.Project, error) {
+	workingDir := c.ueWorkingDir(instanceID)
+
+	c.materializeMu.Lock()
+	defer c.materializeMu.Unlock()
+
+	composeFilePath := filepath.Join(workingDir, "docker-compose.yaml")
+	alreadyMaterialized := false
+	if _, err := os.Stat(composeFilePath); err == nil {
+		alreadyMaterialized = true
+	}
+
+	if forceMaterialize || !alreadyMaterialized {
+		if cfg == nil {
+			return nil, fmt.Errorf("ue instance %s has not been deployed yet", instanceID)
+		}
+		if err := os.RemoveAll(workingDir); err != nil {
+			return nil, fmt.Errorf("failed to clean working dir %s: %v", workingDir, err)
+		}
+		if err := os.MkdirAll(workingDir, 0755); err != nil {
+			return nil, fmt.Errorf("failed to create working dir %s: %v", workingDir, err)
+		}
+
+		templateFS, err := fs.Sub(ueTemplateFS, "templates/ue")
+		if err != nil {
+			return nil, fmt.Errorf("failed to open ue template: %v", err)
+		}
+		if err := renderTemplateFS(templateFS, workingDir, struct {
+			InstanceID string
+			*UeInstanceConfig
+		}{InstanceID: instanceID, UeInstanceConfig: cfg}); err != nil {
+			return nil, fmt.Errorf("failed to materialize ue instance %s: %v", instanceID, err)
+		}
+		if err := restoreScriptPermissions(workingDir); err != nil {
+			return nil, fmt.Errorf("failed to restore script permissions for ue instance %s: %v", instanceID, err)
+		}
+	}
+
+	project, err := loader.LoadWithContext(ctx, types.ConfigDetails{
+		WorkingDir: workingDir,
+		ConfigFiles: []types.ConfigFile{
+			{Filename: filepath.Join(workingDir, "docker-compose.yaml")},
+		},
+	}, func(o *loader.Options) {
+		o.SetProjectName(c.ueProjectName(instanceID), true)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to load compose project for ue instance %s: %v", instanceID, err)
+	}
+
+	stampComposeLabels(project)
+
+	return project, nil
+}
+
+// renderTemplateFS walks every file under src, rendering *.tmpl files as Go
+// templates against data (writing the result without the .tmpl suffix) and
+// copying every other file verbatim into dest.
+func renderTemplateFS(src fs.FS, dest string, data any) error {
+	return fs.WalkDir(src, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+
+		content, err := fs.ReadFile(src, path)
+		if err != nil {
+			return fmt.Errorf("failed to read template file %s: %v", path, err)
+		}
+
+		destPath := filepath.Join(dest, path)
+		if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
+			return err
+		}
+
+		if !strings.HasSuffix(path, ".tmpl") {
+			return os.WriteFile(destPath, content, 0644)
+		}
+
+		destPath = strings.TrimSuffix(destPath, ".tmpl")
+		tmpl, err := template.New(filepath.Base(path)).Parse(string(content))
+		if err != nil {
+			return fmt.Errorf("failed to parse template file %s: %v", path, err)
+		}
+
+		f, err := os.Create(destPath)
+		if err != nil {
+			return fmt.Errorf("failed to create %s: %v", destPath, err)
+		}
+		defer func() { _ = f.Close() }()
+
+		return tmpl.Execute(f, data)
+	})
+}
+
+func (c *composeContext) UpUe(ctx context.Context, instanceID string, cfg *UeInstanceConfig) error {
+	project, err := c.loadUeProject(ctx, instanceID, cfg, true)
+	if err != nil {
+		return err
+	}
+
+	c.CtxLog.Infof("Deploying ue instance %s (project %s)", instanceID, project.Name)
+	return c.up(ctx, project)
+}
+
+func (c *composeContext) DownUe(ctx context.Context, instanceID string) error {
+	project, err := c.loadUeProject(ctx, instanceID, nil, false)
+	if err != nil {
+		return err
+	}
+
+	c.CtxLog.Infof("Stopping ue instance %s (project %s)", instanceID, project.Name)
+	return c.service.Down(ctx, project.Name, api.DownOptions{
+		Project: project,
+	})
+}
+
+func (c *composeContext) StatusUe(ctx context.Context, instanceID string) (*ComposeStatusResult, error) {
+	project, err := c.loadUeProject(ctx, instanceID, nil, false)
+	if err != nil {
+		return nil, err
+	}
+
+	summaries, err := c.service.Ps(ctx, project.Name, api.PsOptions{Project: project, All: true})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get status for ue instance %s: %v", instanceID, err)
+	}
+
+	return summariesToStatusResult(summaries), nil
+}
+
+func (c *composeContext) LogsUe(ctx context.Context, instanceID string) ([]string, error) {
+	project, err := c.loadUeProject(ctx, instanceID, nil, false)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.fetchLogs(ctx, project, nil)
+}
+
+// ListUeInstances enumerates every ue instance that has ever been deployed
+// (running or stopped) by reading the instance subdirectories materialized
+// under <workDir>/ue - mirrors how a stopped free5gc/gnb still reports a
+// "stopped" status rather than disappearing.
+func (c *composeContext) ListUeInstances() ([]string, error) {
+	dir := filepath.Join(c.workDir, constant.DEPLOY_TARGET_UE)
+
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return []string{}, nil
+		}
+		return nil, fmt.Errorf("failed to list ue instances: %v", err)
+	}
+
+	instances := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		if entry.IsDir() {
+			instances = append(instances, entry.Name())
+		}
+	}
+
+	return instances, nil
+}
+
+func (c *composeContext) ueContainerName(instanceID string) string {
+	return "ue-" + instanceID
+}
+
+// AttachUeShell execs an interactive shell inside a running ue instance's
+// container and returns the raw, bidirectional hijacked stream plus the exec
+// ID (needed for ResizeUeShell). TTY mode means stdout/stderr are already
+// combined into one stream with no framing, so the caller can just copy
+// bytes straight to/from a websocket without any stdcopy demuxing.
+func (c *composeContext) AttachUeShell(ctx context.Context, instanceID string) (dockerclient.HijackedResponse, string, error) {
+	containerName := c.ueContainerName(instanceID)
+	apiClient := c.dockerCli.Client()
+
+	execCreated, err := apiClient.ExecCreate(ctx, containerName, dockerclient.ExecCreateOptions{
+		Cmd:          []string{"/bin/sh"},
+		AttachStdin:  true,
+		AttachStdout: true,
+		AttachStderr: true,
+		TTY:          true,
+	})
+	if err != nil {
+		return dockerclient.HijackedResponse{}, "", fmt.Errorf("failed to create shell for ue instance %s: %v", instanceID, err)
+	}
+
+	attached, err := apiClient.ExecAttach(ctx, execCreated.ID, dockerclient.ExecAttachOptions{TTY: true})
+	if err != nil {
+		return dockerclient.HijackedResponse{}, "", fmt.Errorf("failed to attach shell for ue instance %s: %v", instanceID, err)
+	}
+
+	return attached.HijackedResponse, execCreated.ID, nil
+}
+
+// ResizeUeShell tells the container-side pty about the browser terminal's
+// current size, so full-screen programs (vi, top, ...) render correctly.
+func (c *composeContext) ResizeUeShell(ctx context.Context, execID string, height, width uint) error {
+	_, err := c.dockerCli.Client().ExecResize(ctx, execID, dockerclient.ExecResizeOptions{
+		Height: height,
+		Width:  width,
+	})
+	return err
+}
