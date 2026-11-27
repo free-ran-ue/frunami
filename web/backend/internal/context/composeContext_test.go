@@ -130,3 +130,20 @@ func TestUeUpFailureTakesTheInstanceDown(t *testing.T) {
 		t.Fatalf("downs %v", fake.downs)
 	}
 }
+
+// Shutdown tears down UE instances first, then the gNBs, then the core,
+// and leaves projects that are not frunami's alone.
+func TestTeardownOrder(t *testing.T) {
+	projects := map[string]bool{
+		"frunami-free5gc":   true,
+		"frunami-gnb":       true,
+		"frunami-ue-imsi-2": true,
+		"frunami-ue-imsi-1": true,
+		"someone-else":      true,
+	}
+	got := teardownOrder(projects, defaultTargets())
+	want := []string{"frunami-ue-imsi-1", "frunami-ue-imsi-2", "frunami-gnb", "frunami-free5gc"}
+	if strings.Join(got, ",") != strings.Join(want, ",") {
+		t.Fatalf("got %v; want %v", got, want)
+	}
+}
