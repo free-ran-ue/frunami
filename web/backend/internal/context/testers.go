@@ -14,7 +14,7 @@ const testersBucket = "testers"
 
 var ErrTesterNotFound = errors.New("tester not found")
 
-// TesterRecord is one added tester: where fru-lab reaches it and the API
+// TesterRecord is one added tester: where frunami reaches it and the API
 // token it sends.
 type TesterRecord struct {
 	ID       string    `json:"id"`

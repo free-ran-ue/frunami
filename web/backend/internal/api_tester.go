@@ -11,7 +11,7 @@ import (
 
 // getTesterRoutes are the Throughput Tester routes behind the JWT header
 // middleware. Everything except the saved profile is forwarded to
-// fru-tester unchanged (see newTesterProxy).
+// frunami-tester unchanged (see newTesterProxy).
 func (b *backend) getTesterRoutes() util.Routes {
 	return util.Routes{
 		{Name: "TesterProfileList", Method: http.MethodGet, Pattern: "/tester/profiles",

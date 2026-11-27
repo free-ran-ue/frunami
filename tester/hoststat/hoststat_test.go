@@ -25,7 +25,7 @@ func fakeRoot(t *testing.T, files map[string]string) {
 func TestMemoryReadsTheHostTheProcessAndTheCgroupV2Limit(t *testing.T) {
 	fakeRoot(t, map[string]string{
 		"proc/meminfo":     "MemTotal:       16384 kB\nMemFree:  1 kB\nMemAvailable:    8192 kB\n",
-		"proc/self/status": "Name:\tfru-tester\nVmRSS:\t    2048 kB\n",
+		"proc/self/status": "Name:\tfrunami-tester\nVmRSS:\t    2048 kB\n",
 		"proc/self/cgroup": "0::/kubepods/pod1/c1\n",
 		"sys/fs/cgroup/kubepods/pod1/c1/memory.max":     "4294967296\n",
 		"sys/fs/cgroup/kubepods/pod1/c1/memory.current": "1073741824\n",

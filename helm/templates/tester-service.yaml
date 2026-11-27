@@ -4,7 +4,7 @@ kind: Service
 metadata:
   name: {{ include "tester.name" . }}
   labels:
-    {{- include "frulab.labels" . | nindent 4 }}
+    {{- include "frunami.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
   selector:

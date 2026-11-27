@@ -39,7 +39,7 @@ func TestCheckAllocation(t *testing.T) {
 	require.Empty(t, errs, "nothing set: nothing pinned")
 
 	_, _, errs = Allocation{CpCpus: "0-2", DpCpus: "2-7"}.Check(allowed)
-	require.Equal(t, []FieldError{{"dpCpus", "CPU 6-7 not available to fru-tester (it may use 0-5)"}}, errs)
+	require.Equal(t, []FieldError{{"dpCpus", "CPU 6-7 not available to frunami-tester (it may use 0-5)"}}, errs)
 
 	_, _, errs = Allocation{CpCpus: "0-2", DpCpus: "2-5"}.Check(allowed)
 	require.Equal(t, []FieldError{{"dpCpus", "CPU 2 is also a control plane CPU"}}, errs)

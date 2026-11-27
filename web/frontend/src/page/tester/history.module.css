@@ -14,9 +14,9 @@
 }
 .btn:hover:not(:disabled) { background: var(--surface-sunken); }
 .btn:disabled { opacity: 0.5; cursor: default; }
-.btnP { background: var(--accent); border-color: var(--accent); color: #FFFFFF; }
+.btnP { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .btnP:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
-.btnDanger { border-color: var(--bad); background: var(--bad); color: var(--surface); }
+.btnDanger { border-color: var(--bad-ink); background: var(--bad-ink); color: var(--surface); }
 .btnDanger:hover:not(:disabled) { background: var(--bad-ink); border-color: var(--bad-ink); color: var(--surface); }
 
 .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); min-width: 0; scroll-margin-top: 1rem; }

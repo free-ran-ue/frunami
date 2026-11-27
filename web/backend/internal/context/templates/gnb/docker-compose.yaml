@@ -18,7 +18,7 @@ services:
 networks:
   cn-ran:
     external: true
-    name: frulab-cn-ran
+    name: frunami-cn-ran
   ran-ue:
     external: true
-    name: frulab-ran-ue
+    name: frunami-ran-ue

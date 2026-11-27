@@ -119,7 +119,7 @@ type UeFailure struct {
 // maxFailuresListed bounds the snapshot; UeSummary.Failed has the total.
 const maxFailuresListed = 200
 
-// Report is a finished run as fru-lab stores it in its history: the
+// Report is a finished run as frunami stores it in its history: the
 // profile it ran with and its final snapshot (series included).
 type Report struct {
 	Profile  profile.Profile `json:"profile"`

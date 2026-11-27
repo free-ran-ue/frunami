@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestWebconsoleProxyStripsThePrefixAndFruLabAuth(t *testing.T) {
+func TestWebconsoleProxyStripsThePrefixAndFrunamiAuth(t *testing.T) {
 	var gotPath, gotToken, gotAuth string
 	webconsole := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotPath, gotToken, gotAuth = r.URL.Path, r.Header.Get("Token"), r.Header.Get("Authorization")
@@ -23,7 +23,7 @@ func TestWebconsoleProxyStripsThePrefixAndFruLabAuth(t *testing.T) {
 	}
 	req := httptest.NewRequest(http.MethodGet, "/api/webconsole/api/subscriber", nil)
 	req.Header.Set("Token", "webconsole-jwt")
-	req.Header.Set("Authorization", "Bearer fru-lab-jwt")
+	req.Header.Set("Authorization", "Bearer frunami-jwt")
 	rec := httptest.NewRecorder()
 	proxy.ServeHTTP(rec, req)
 
@@ -35,7 +35,7 @@ func TestWebconsoleProxyStripsThePrefixAndFruLabAuth(t *testing.T) {
 		t.Fatalf("path %q; want the /api/webconsole prefix stripped", gotPath)
 	}
 	if gotToken != "webconsole-jwt" || gotAuth != "" {
-		t.Fatalf("token %q auth %q; want the webconsole token kept and fru-lab's JWT dropped", gotToken, gotAuth)
+		t.Fatalf("token %q auth %q; want the webconsole token kept and frunami's JWT dropped", gotToken, gotAuth)
 	}
 }
 

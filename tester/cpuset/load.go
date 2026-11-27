@@ -19,7 +19,7 @@ type CpuLoad struct {
 }
 
 // Load is every online CPU's load over one interval. It is the whole
-// host's, not only fru-tester's: /proc/stat is not per container.
+// host's, not only frunami-tester's: /proc/stat is not per container.
 type Load struct {
 	IntervalMs int64     `json:"intervalMs"`
 	Cpus       []CpuLoad `json:"cpus"`

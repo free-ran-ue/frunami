@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Configuration, DefaultApi } from './api'
 
-// apiBaseUrl is where fru-lab's API lives. fru-lab's backend serves this
+// apiBaseUrl is where FRUNAMI's API lives. FRUNAMI's backend serves this
 // page too, so by default it is the page's own origin (any port, http or
 // https, behind a reverse proxy or not). VITE_API_BASE_URL overrides it;
 // `npm run dev` instead proxies /api to the backend (vite.config.ts).

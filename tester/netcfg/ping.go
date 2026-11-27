@@ -22,7 +22,7 @@ type Pinger interface {
 }
 
 // ICMPPinger is the real Pinger. It opens a raw ICMP socket bound to src,
-// so it needs root or CAP_NET_RAW (fru-tester runs as root).
+// so it needs root or CAP_NET_RAW (frunami-tester runs as root).
 type ICMPPinger struct{}
 
 // pingGap spaces echo requests that were answered quickly.
@@ -42,7 +42,7 @@ func (ICMPPinger) Ping(src, dst netip.Addr, count int, timeout time.Duration) ([
 		if seq > 0 {
 			time.Sleep(pingGap)
 		}
-		msg, _ := (&icmp.Message{Type: ipv4.ICMPTypeEcho, Body: &icmp.Echo{ID: id, Seq: seq, Data: []byte("fru-tester ping test")}}).Marshal(nil)
+		msg, _ := (&icmp.Message{Type: ipv4.ICMPTypeEcho, Body: &icmp.Echo{ID: id, Seq: seq, Data: []byte("frunami-tester ping test")}}).Marshal(nil)
 		sent := time.Now()
 		if _, err := c.WriteTo(msg, to); err != nil {
 			return rtts, fmt.Errorf("send to %s: %w", dst, err)

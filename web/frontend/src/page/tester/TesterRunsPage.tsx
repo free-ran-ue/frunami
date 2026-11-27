@@ -107,7 +107,7 @@ export default function TesterRunsPage() {
       for (const t of testers) {
         api.testerByIdRun(t.id, 0, 0)
           .then((r) => { if (!cancelled) setRuns((cur) => ({ ...cur, [t.id]: { kind: 'ok', run: r.data } })) })
-          .catch((error) => { if (!cancelled) setRuns((cur) => ({ ...cur, [t.id]: { kind: 'down', message: extractErrorMessage(error, 'fru-tester did not answer') } })) })
+          .catch((error) => { if (!cancelled) setRuns((cur) => ({ ...cur, [t.id]: { kind: 'down', message: extractErrorMessage(error, 'frunami-tester did not answer') } })) })
       }
     }
     read()

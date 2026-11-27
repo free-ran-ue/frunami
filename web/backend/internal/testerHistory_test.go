@@ -131,7 +131,7 @@ func TestWatcherStoresEachRunOnce(t *testing.T) {
 	if strings.Join(store.ids, ",") != "20261002-150405,20261002-150410" {
 		t.Fatalf("stored %v; want each run once", store.ids)
 	}
-	// the report as fru-tester sent it, plus the tester that ran it (named
+	// the report as frunami-tester sent it, plus the tester that ran it (named
 	// by its id here: this fake has no /api/status)
 	var stored map[string]json.RawMessage
 	if err := json.Unmarshal(store.runs["20261002-150405"], &stored); err != nil {

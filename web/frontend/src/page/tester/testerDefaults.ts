@@ -1,11 +1,11 @@
 import type { TesterProfile } from '../../api'
 
 // Starting point for a first-time setup page; values match the basic
-// free5GC template fru-lab deploys (AMF 10.0.1.3, UPF 10.0.1.5 on the
-// frulab-cn-ran bridge, host side docker-cn-ran) so it runs as-is there.
+// free5GC template FRUNAMI deploys (AMF 10.0.1.3, UPF 10.0.1.5 on the
+// frunami-cn-ran bridge, host side docker-cn-ran) so it runs as-is there.
 // The UE template matches free-ran-ue's sample ue.yaml subscriber; create
 // subscribers imsi-208930000000001.. in the core with the same keys.
-// DEFAULT_TESTER_ID is the tester in fru-lab's config.yaml; profiles
+// DEFAULT_TESTER_ID is the tester in FRUNAMI's config.yaml; profiles
 // saved before testers could be chosen run there.
 export const DEFAULT_TESTER_ID = 'default'
 
@@ -38,7 +38,7 @@ export const DEFAULT_TESTER_PROFILE: TesterProfile = {
   network: {
     n2: { interface: 'docker-cn-ran', cidr: '10.0.1.0/24', startIp: '10.0.1.100', amfIp: '10.0.1.3', amfPort: 38412 },
     n3: { interface: 'docker-cn-ran', cidr: '10.0.1.0/24', startIp: '10.0.1.100', upfIp: '10.0.1.5', upfPort: 2152 },
-    // fru-lab's UPF has no separate N6 network: decapsulated uplink leaves it
+    // FRUNAMI's UPF has no separate N6 network: decapsulated uplink leaves it
     // on docker-cn-ran too, so the host's own address there is the sink
     n6: { interface: 'docker-cn-ran', sinkIp: '10.0.1.1/24', upfIp: '10.0.1.5', uePool: '10.60.0.0/16' },
   },
@@ -54,7 +54,7 @@ export const DEFAULT_TESTER_PROFILE: TesterProfile = {
 
 // normalizeProfile turns whatever was saved into a complete profile:
 // every field missing or of the wrong type takes its default, and keys
-// this version doesn't know are dropped (fru-tester rejects unknown
+// this version doesn't know are dropped (frunami-tester rejects unknown
 // fields). Saved profiles can predate fields added in later phases.
 export function normalizeProfile(saved: unknown): TesterProfile {
   const p = mergeKnown(DEFAULT_TESTER_PROFILE, saved) as TesterProfile
@@ -79,7 +79,7 @@ function mergeKnown(defaults: unknown, saved: unknown): unknown {
 }
 
 // forTester is the profile as a tester takes it: without testerId, which
-// only fru-lab reads (a tester rejects fields it does not know), and
+// only FRUNAMI reads (a tester rejects fields it does not know), and
 // without N2 pacing left at 0 (no limit), so a tester older than those
 // knobs still takes it.
 export function forTester(p: TesterProfile): TesterProfile {

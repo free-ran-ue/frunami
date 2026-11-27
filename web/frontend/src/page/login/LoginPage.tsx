@@ -4,7 +4,7 @@ import { useNotifications } from '../../hooks/useNotifications'
 import { api, extractErrorMessage } from '../../apiClient'
 import { useNavigate } from 'react-router-dom'
 import { LogoMark } from '../../components/sidebar/Sidebar'
-import logoBanner from '../../assets/frulab-logo.png'
+import logoBanner from '../../assets/frunami-banner.webp'
 import styles from './login-page.module.css'
 
 // FEATURES are the brand panel's three lines under the banner.
@@ -48,11 +48,11 @@ export default function LoginPage() {
         onClose={removeNotification}
       />
 
-      <section className={styles.brandPanel} aria-label="fru-lab">
+      <section className={styles.brandPanel} aria-label="FRUNAMI">
         <img
           className={styles.banner}
           src={logoBanner}
-          alt="fru-lab: free5GC and free-ran-ue in containers, connected over 5G"
+          alt="FRUNAMI: large-scale RAN/UE traffic simulator"
         />
         <div className={styles.features}>
           {FEATURES.map((f) => (
@@ -68,12 +68,12 @@ export default function LoginPage() {
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.brand}>
             <LogoMark size={36} />
-            <span className={styles.wordmark}>fru-<span className={styles.wordmarkLab}>lab</span></span>
+            <span className={styles.wordmark}>FRUNAMI</span>
           </div>
 
           <div className={styles.headerBlock}>
             <h1 className={styles.title}>Sign in</h1>
-            <p className={styles.subtitle}>Use the account in fru-lab&apos;s config.yaml.</p>
+            <p className={styles.subtitle}>Use the account in config.yaml.</p>
           </div>
 
           <div className={styles.field}>

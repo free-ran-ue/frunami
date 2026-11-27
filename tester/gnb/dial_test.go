@@ -15,10 +15,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Needs the sctp kernel module: FRU_TESTER_SCTP=1 go test ./gnb/ -run SCTP
+// Needs the sctp kernel module: FRUNAMI_TESTER_SCTP=1 go test ./gnb/ -run SCTP
 func TestSCTPDialerLoopback(t *testing.T) {
-	if os.Getenv("FRU_TESTER_SCTP") != "1" {
-		t.Skip("set FRU_TESTER_SCTP=1 (and `sudo modprobe sctp`) to run")
+	if os.Getenv("FRUNAMI_TESTER_SCTP") != "1" {
+		t.Skip("set FRUNAMI_TESTER_SCTP=1 (and `sudo modprobe sctp`) to run")
 	}
 	ln, err := sctp.ListenSCTP("sctp", &sctp.SCTPAddr{IPAddrs: []net.IPAddr{{IP: net.ParseIP("127.0.0.1")}}, Port: 0})
 	require.NoError(t, err)
@@ -68,8 +68,8 @@ func sctpServer(t *testing.T, serve func(*sctp.SCTPConn)) int {
 }
 
 func needSCTP(t *testing.T) {
-	if os.Getenv("FRU_TESTER_SCTP") != "1" {
-		t.Skip("set FRU_TESTER_SCTP=1 (and `sudo modprobe sctp`) to run")
+	if os.Getenv("FRUNAMI_TESTER_SCTP") != "1" {
+		t.Skip("set FRUNAMI_TESTER_SCTP=1 (and `sudo modprobe sctp`) to run")
 	}
 }
 

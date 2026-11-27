@@ -333,7 +333,7 @@ func (e *Engine) activate(f *flow) {
 }
 
 // growReadBuffer asks for rcvBuf, forcing past net.core.rmem_max when the
-// process may (fru-tester runs with CAP_NET_ADMIN), else as much as allowed.
+// process may (frunami-tester runs with CAP_NET_ADMIN), else as much as allowed.
 func growReadBuffer(c *net.UDPConn) {
 	raw, err := c.SyscallConn()
 	if err == nil {
@@ -691,7 +691,7 @@ func (r *reader) loop(handle func([]byte)) {
 }
 
 // readSink receives uplink after the UPF decapsulated it, on one socket of
-// the sink's SO_REUSEPORT group. The source may be NATed (fru-lab's UPF
+// the sink's SO_REUSEPORT group. The source may be NATed (frunami's UPF
 // masquerades), so the UE comes from the header.
 func (r *reader) readSink() {
 	r.loop(func(payload []byte) {

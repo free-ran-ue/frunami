@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_NAME: alonza0314/fru-lab
-  TESTER_IMAGE_NAME: alonza0314/fru-tester
+  IMAGE_NAME: alonza0314/frunami
+  TESTER_IMAGE_NAME: alonza0314/frunami-tester
 
 jobs:
   build:
@@ -28,13 +28,13 @@ jobs:
       - name: Test Docker image
         run: |
           docker images
-          docker run --rm ${{ env.IMAGE_NAME }}:test ls /frulab/fru-lab
-          docker run --rm ${{ env.IMAGE_NAME }}:test ls /frulab/frontend
+          docker run --rm ${{ env.IMAGE_NAME }}:test ls /frunami/frunami
+          docker run --rm ${{ env.IMAGE_NAME }}:test ls /frunami/frontend
 
-      - name: Test fru-tester Docker image
+      - name: Test frunami-tester Docker image
         run: |
-          docker run --rm ${{ env.TESTER_IMAGE_NAME }}:test ls /frutester/fru-tester
-          docker run --rm ${{ env.TESTER_IMAGE_NAME }}:test ./fru-tester --help
+          docker run --rm ${{ env.TESTER_IMAGE_NAME }}:test ls /frunami-tester/frunami-tester
+          docker run --rm ${{ env.TESTER_IMAGE_NAME }}:test ./frunami-tester --help
 
   version-release:
     name: Release Version Image
@@ -57,7 +57,7 @@ jobs:
           push: true
           tags: ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
 
-      - name: Build and push fru-tester
+      - name: Build and push frunami-tester
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -86,7 +86,7 @@ jobs:
           push: true
           tags: ${{ env.IMAGE_NAME }}:latest
 
-      - name: Build and push fru-tester
+      - name: Build and push frunami-tester
         uses: docker/build-push-action@v6
         with:
           context: .

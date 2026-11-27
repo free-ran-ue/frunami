@@ -1,4 +1,4 @@
-/* The v2 page frame in the v1 colours: sidebar, a 72px white header bar (as tall as the sidebar's brand row),
+/* The page frame: sidebar, a 72px header bar on --surface (as tall as the sidebar's brand row),
    the content column (20px 24px 24px, 16px gaps) and a 26px status bar. */
 .shell {
   display: flex;

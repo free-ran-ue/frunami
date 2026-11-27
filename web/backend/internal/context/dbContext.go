@@ -40,11 +40,11 @@ func newDbContext(dbContextIE *dbContextIE) (*dbContext, error) {
 }
 
 // testerHistoryBucket holds finished Throughput Tester runs (design N7),
-// keyed by run ID; fru-tester's run IDs (20261002-150405) sort by time.
+// keyed by run ID; frunami-tester's run IDs (20261002-150405) sort by time.
 const testerHistoryBucket = "tester-history"
 
 // testerHistoryDeletedBucket remembers the runs a user deleted: a tester
-// keeps its last few runs, and fru-lab must not copy them back.
+// keeps its last few runs, and frunami must not copy them back.
 const testerHistoryDeletedBucket = "tester-history-deleted"
 
 // testerHistoryDeletedKeep bounds the remembered deletions; the oldest go

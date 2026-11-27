@@ -9,7 +9,7 @@ export interface TesterOption extends TesterEntry {
   reachable: boolean | null
 }
 
-// useTesters lists the testers fru-lab can reach, each named by its own
+// useTesters lists the testers FRUNAMI can reach, each named by its own
 // status (its URL until then, or when it does not answer). null while
 // loading; [] when even the list failed.
 export function useTesters(): { testers: TesterOption[] | null, reload: () => void } {

@@ -1,4 +1,4 @@
-// Package api is fru-tester's HTTP surface. fru-lab's backend is the only
+// Package api is frunami-tester's HTTP surface. frunami's backend is the only
 // intended client: it authenticates users and forwards requests here with
 // the shared API token.
 package api
@@ -306,7 +306,7 @@ func handleStop(ctrl Controller) gin.HandlerFunc {
 }
 
 var upgrader = websocket.Upgrader{
-	// Only fru-lab's backend reaches this port (token-guarded above).
+	// Only frunami's backend reaches this port (token-guarded above).
 	CheckOrigin: func(*http.Request) bool { return true },
 }
 

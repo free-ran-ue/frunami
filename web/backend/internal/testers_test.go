@@ -36,7 +36,7 @@ func (m *memTesters) DeleteTester(id string) error {
 	return flctx.ErrTesterNotFound
 }
 
-// fakeTester answers like fru-tester: name on /api/status, the path it
+// fakeTester answers like frunami-tester: name on /api/status, the path it
 // was asked for elsewhere, 401 for any other token.
 func fakeTester(t *testing.T, name, token string) *httptest.Server {
 	t.Helper()
@@ -68,7 +68,7 @@ func TestAddingATesterChecksItAnswers(t *testing.T) {
 	if _, err := r.add(ctx, lab2.URL, "wrong"); err == nil || !strings.Contains(err.Error(), "rejected the API token") {
 		t.Fatalf("wrong token: %v", err)
 	}
-	if _, err := r.add(ctx, "http://127.0.0.1:1", "x"); err == nil || !strings.Contains(err.Error(), "no fru-tester answered") {
+	if _, err := r.add(ctx, "http://127.0.0.1:1", "x"); err == nil || !strings.Contains(err.Error(), "no frunami-tester answered") {
 		t.Fatalf("nothing there: %v", err)
 	}
 	if _, err := r.add(ctx, "10.0.0.2:9100", "x"); err == nil || !strings.Contains(err.Error(), "must be like") {
@@ -92,7 +92,7 @@ func TestAddingATesterChecksItAnswers(t *testing.T) {
 		t.Fatalf("list %+v", list)
 	}
 
-	// a restarted fru-lab finds it again
+	// a restarted frunami finds it again
 	again, err := newTesterRegistry(def.URL, "d", store)
 	if err != nil || len(again.list()) != 2 {
 		t.Fatalf("reload: %v %+v", err, again.list())

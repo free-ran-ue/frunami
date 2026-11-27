@@ -378,7 +378,7 @@ function CpLoopPanel({ cp }: { cp: TesterCpLoopSnapshot }) {
         </div>
         <div className={styles.panelHead}>
           <span className={styles.legendKey}><i className={styles.keyDl} />Registrations/s</span>
-          <span className={styles.legendKey}><i className={styles.keyDereg} style={{ background: 'repeating-linear-gradient(90deg, var(--violet) 0 0.25rem, transparent 0.25rem 0.4375rem)' }} />Deregistrations/s</span>
+          <span className={styles.legendKey}><i className={styles.keyDereg} style={{ background: 'repeating-linear-gradient(90deg, var(--chart-2) 0 0.25rem, transparent 0.25rem 0.4375rem)' }} />Deregistrations/s</span>
           <span className={styles.legendKey}><i className={styles.keyFail} />Failed/s</span>
         </div>
         <RateChart series={cp.series} lines={CP_LINES} label="Control-plane procedures per second over time" empty="The chart starts after two seconds of the loop." />
@@ -458,7 +458,7 @@ export default function TesterRunDetailPage() {
   }, [])
 
   // Keep one stream open while the page is mounted; reconnect after drops
-  // (fru-tester restart, network blip) so the numbers never silently freeze.
+  // (frunami-tester restart, network blip) so the numbers never silently freeze.
   useEffect(() => {
     let socket: WebSocket | null = null
     let retryTimer: number | undefined
@@ -672,7 +672,7 @@ function RunBody({ s, gnbPage, gnbStates, onGnbs: showGnbs }: RunBodyProps) {
           <div className={styles.panelHead}>
             <h2 className={styles.panelTitle}>Setup rate</h2>
             <span className={styles.legendKey}><i className={styles.keyDl} />Registrations/s</span>
-            <span className={styles.legendKey}><i className={styles.keyDereg} style={{ background: 'repeating-linear-gradient(90deg, var(--violet) 0 0.25rem, transparent 0.25rem 0.4375rem)' }} />PDU sessions/s</span>
+            <span className={styles.legendKey}><i className={styles.keyDereg} style={{ background: 'repeating-linear-gradient(90deg, var(--chart-2) 0 0.25rem, transparent 0.25rem 0.4375rem)' }} />PDU sessions/s</span>
             <span className={styles.legendKey}><i className={styles.keyFail} />Failed/s</span>
             <span className={styles.panelNote}>{lastSetup && reg.done && s.pdu.done ? `until ${clock(lastSetup.t)}` : 'per second'}</span>
           </div>

@@ -53,7 +53,7 @@ func TestTesterProxyReportsUnreachableAs502(t *testing.T) {
 	proxy.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/api/tester/run", nil))
 	var body map[string]string
 	_ = json.Unmarshal(rec.Body.Bytes(), &body)
-	if rec.Code != http.StatusBadGateway || !strings.HasPrefix(body["message"], "fru-tester is unreachable") {
+	if rec.Code != http.StatusBadGateway || !strings.HasPrefix(body["message"], "frunami-tester is unreachable") {
 		t.Fatalf("got %d %q", rec.Code, rec.Body.String())
 	}
 }
@@ -109,7 +109,7 @@ func TestTesterRoutesAnswer503WhenNotConfigured(t *testing.T) {
 	}
 }
 
-// fru-tester answering 401 means fru-lab's tester.apiToken is wrong. That
+// frunami-tester answering 401 means frunami's tester.apiToken is wrong. That
 // must not reach the browser as 401, which the frontend treats as an
 // expired login and logs the user out.
 func TestTesterProxyMapsUpstream401To502(t *testing.T) {

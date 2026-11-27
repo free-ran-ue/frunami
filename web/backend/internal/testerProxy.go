@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var errTesterTokenMismatch = errors.New("fru-tester rejected the API token: backend.tester.apiToken does not match fru-tester's apiToken")
+var errTesterTokenMismatch = errors.New("frunami-tester rejected the API token: backend.tester.apiToken does not match frunami-tester's apiToken")
 
 // newTesterProxy forwards /api/tester/<rest> to <testerURL>/api/<rest>.
 func newTesterProxy(testerURL, apiToken string) (*httputil.ReverseProxy, error) {
@@ -19,7 +19,7 @@ func newTesterProxy(testerURL, apiToken string) (*httputil.ReverseProxy, error) 
 
 // newTesterProxyAt forwards <prefix>/<rest> to <testerURL>/api/<rest>.
 // The caller has already checked the user's JWT; the proxy replaces it
-// with fru-tester's own API token and drops the ?token= query param the
+// with frunami-tester's own API token and drops the ?token= query param the
 // WebSocket route uses. WebSocket upgrades pass through unchanged.
 func newTesterProxyAt(testerURL, apiToken, prefix string) (*httputil.ReverseProxy, error) {
 	target, err := url.Parse(testerURL)
@@ -38,7 +38,7 @@ func newTesterProxyAt(testerURL, apiToken, prefix string) (*httputil.ReverseProx
 			pr.Out.Host = target.Host
 			pr.Out.Header.Set("Authorization", "Bearer "+apiToken)
 		},
-		// fru-tester only answers 401 when our apiToken is wrong. Passing
+		// frunami-tester only answers 401 when our apiToken is wrong. Passing
 		// that through would make the frontend drop the user's login.
 		ModifyResponse: func(resp *http.Response) error {
 			if resp.StatusCode == http.StatusUnauthorized {
@@ -47,7 +47,7 @@ func newTesterProxyAt(testerURL, apiToken, prefix string) (*httputil.ReverseProx
 			return nil
 		},
 		ErrorHandler: func(w http.ResponseWriter, _ *http.Request, err error) {
-			message := "fru-tester is unreachable: " + err.Error()
+			message := "frunami-tester is unreachable: " + err.Error()
 			if errors.Is(err, errTesterTokenMismatch) {
 				message = err.Error()
 			}

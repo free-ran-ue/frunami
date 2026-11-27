@@ -1,5 +1,5 @@
 // Package xdp gives the data plane an AF_XDP path: a small XDP program
-// that hands fru-tester's own UDP packets to AF_XDP sockets (everything
+// that hands frunami-tester's own UDP packets to AF_XDP sockets (everything
 // else goes on to the kernel), the sockets themselves, and next-hop MAC
 // lookup for building whole Ethernet frames.
 //

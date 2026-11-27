@@ -558,7 +558,7 @@ export interface TesterProcedureRate {
 export interface TesterProfile {
     'name': string;
     /**
-     * Which tester (GET /api/testers) runs this profile; absent means \"default\", the one in config.yaml. Only fru-lab reads it; leave it out of what is sent to a tester, which rejects fields it does not know.
+     * Which tester (GET /api/testers) runs this profile; absent means \"default\", the one in config.yaml. Only FRUNAMI reads it; leave it out of what is sent to a tester, which rejects fields it does not know.
      */
     'testerId'?: string;
     'scale': TesterProfileScale;
@@ -628,7 +628,7 @@ export interface TesterProfileScale {
     'gnbCount': number;
     'ueCount': number;
     /**
-     * How many UEs, the first ones, establish a PDU session and carry traffic (0..ueCount). The rest are the control-plane test - they register and deregister in a loop (rates.cpLoop) once every throughput UE is done. fru-tester treats an absent value as ueCount.
+     * How many UEs, the first ones, establish a PDU session and carry traffic (0..ueCount). The rest are the control-plane test - they register and deregister in a loop (rates.cpLoop) once every throughput UE is done. frunami-tester treats an absent value as ueCount.
      */
     'throughputUeCount': number;
 }
@@ -756,7 +756,7 @@ export interface TesterStatus {
     'name': string;
     'hostname': string;
     /**
-     * VCS revision fru-tester was built from; empty when the build does not say.
+     * VCS revision frunami-tester was built from; empty when the build does not say.
      */
     'version': string;
     'goVersion': string;
@@ -792,7 +792,7 @@ export interface TesterStatusCapabilities {
 export interface TesterStatusCpu {
     'online': number;
     /**
-     * CPUs fru-tester may use.
+     * CPUs frunami-tester may use.
      */
     'allowed': number;
     'load1': number;
@@ -807,12 +807,12 @@ export interface TesterStatusMemory {
     'hostTotal': number;
     'hostAvailable': number;
     /**
-     * fru-tester\'s resident memory.
+     * frunami-tester\'s resident memory.
      */
     'processRss': number;
     'goHeap': number;
     /**
-     * Memory limit of fru-tester\'s cgroup (its container); null when there is none.
+     * Memory limit of frunami-tester\'s cgroup (its container); null when there is none.
      */
     'cgroupLimit': number | null;
     /**
@@ -835,7 +835,7 @@ export interface TesterTopology {
      */
     'online': string;
     /**
-     * Of those, the CPUs fru-tester may use (in a container, its cpuset).
+     * Of those, the CPUs frunami-tester may use (in a container, its cpuset).
      */
     'allowed': string;
     'nodes': Array<TesterNumaNode>;
@@ -1806,7 +1806,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Forwarded to fru-tester. State is `idle` before the first bench.
+         * Forwarded to frunami-tester. State is `idle` before the first bench.
          * @summary Latest data plane bench
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1840,7 +1840,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Measures how fast this host\'s fru-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
+         * Measures how fast this host\'s frunami-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
          * @summary Start a data plane bench
          * @param {TesterBenchSettings} testerBenchSettings 
          * @param {*} [options] Override http request option.
@@ -2375,7 +2375,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * fru-lab remembers the deleted runs, so a tester that still keeps one does not bring it back.
+         * FRUNAMI remembers the deleted runs, so a tester that still keeps one does not bring it back.
          * @summary Delete finished runs from the history
          * @param {TesterHistoryDeleteRequest} testerHistoryDeleteRequest 
          * @param {*} [options] Override http request option.
@@ -2452,7 +2452,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * fru-lab keeps the last 50 runs fru-tester finished.
+         * FRUNAMI keeps the last 50 runs frunami-tester finished.
          * @summary Finished runs, newest first
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2567,8 +2567,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Forwarded to fru-tester. Every link on the host where fru-tester runs, for the Setup page\'s interface menus.
-         * @summary Interfaces on fru-tester\'s host
+         * Forwarded to frunami-tester. Every link on the host where frunami-tester runs, for the Setup page\'s interface menus.
+         * @summary Interfaces on frunami-tester\'s host
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -2601,7 +2601,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Forwarded to fru-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR\'s prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF\'s N3 or the UPF\'s N6 three times, and removes the address again. Only that network\'s fields are checked. Not while a run is active.
+         * Forwarded to frunami-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR\'s prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF\'s N3 or the UPF\'s N6 three times, and removes the address again. Only that network\'s fields are checked. Not while a run is active.
          * @summary Ping test of one network
          * @param {TesterPingRequest} testerPingRequest 
          * @param {*} [options] Override http request option.
@@ -2832,7 +2832,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Forwarded to fru-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
+         * Forwarded to frunami-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
          * @summary Validate a profile and preview the per-gNB plan
          * @param {TesterProfile} testerProfile 
          * @param {*} [options] Override http request option.
@@ -2871,7 +2871,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Forwarded to fru-tester. State is `idle` before the first run.
+         * Forwarded to frunami-tester. State is `idle` before the first run.
          * @summary Current run snapshot
          * @param {number} [gnbOffset] Where the page of gNBs starts, counted within those gnbState keeps.
          * @param {number} [gnbLimit] How many gNBs to list (0–1000); absent lists every gNB. The run stream takes the same three parameters, and its client changes page by sending {\&quot;gnbOffset\&quot;, \&quot;gnbLimit\&quot;, \&quot;gnbState\&quot;} as a text message.
@@ -2920,7 +2920,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Forwarded to fru-tester. Only one run may be active at a time.
+         * Forwarded to frunami-tester. Only one run may be active at a time.
          * @summary Start a run
          * @param {TesterProfile} testerProfile 
          * @param {*} [options] Override http request option.
@@ -2959,7 +2959,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Stops the traffic, deregisters every registered UE, closes every N2 association and removes what fru-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
+         * Stops the traffic, deregisters every registered UE, closes every N2 association and removes what frunami-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
          * @summary Stop the active run
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2993,7 +2993,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Forwarded to fru-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when fru-tester runs in a container), load average and the capabilities a run needs. A 502 means fru-lab could not reach fru-tester.
+         * Forwarded to frunami-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when frunami-tester runs in a container), load average and the capabilities a run needs. A 502 means FRUNAMI could not reach frunami-tester.
          * @summary The tester host and process (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3027,7 +3027,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Forwarded to fru-tester, which reads /proc/stat. The whole host\'s load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
+         * Forwarded to frunami-tester, which reads /proc/stat. The whole host\'s load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
          * @summary How busy each CPU of the tester host is (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3061,7 +3061,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Forwarded to fru-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
+         * Forwarded to frunami-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
          * @summary Set the CPU allocation for the next runs
          * @param {TesterCpuAllocation} testerCpuAllocation 
          * @param {*} [options] Override http request option.
@@ -3100,7 +3100,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Forwarded to fru-tester. cpus is what the next run uses; topology helps choose it.
+         * Forwarded to frunami-tester. cpus is what the next run uses; topology helps choose it.
          * @summary The tester host\'s CPU allocation and layout (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3134,7 +3134,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * fru-lab first asks the tester for its /api/status with the token; it is kept only if it answers.
+         * FRUNAMI first asks the tester for its /api/status with the token; it is kept only if it answers.
          * @summary Add a tester
          * @param {TesterAddRequest} testerAddRequest 
          * @param {*} [options] Override http request option.
@@ -3173,7 +3173,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Only fru-lab forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
+         * Only FRUNAMI forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
          * @summary Remove an added tester
          * @param {string} id A tester from GET /api/testers; \&quot;default\&quot; is the one in config.yaml.
          * @param {*} [options] Override http request option.
@@ -3212,7 +3212,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * The tester in config.yaml (backend.tester, id \"default\", builtIn) first, then the ones added here. API tokens are never returned; each tester\'s name comes from its own status.
-         * @summary Every tester fru-lab can reach (Status page)
+         * @summary Every tester FRUNAMI can reach (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -3533,7 +3533,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Forwarded to fru-tester. State is `idle` before the first bench.
+         * Forwarded to frunami-tester. State is `idle` before the first bench.
          * @summary Latest data plane bench
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3545,7 +3545,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Measures how fast this host\'s fru-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
+         * Measures how fast this host\'s frunami-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
          * @summary Start a data plane bench
          * @param {TesterBenchSettings} testerBenchSettings 
          * @param {*} [options] Override http request option.
@@ -3722,7 +3722,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * fru-lab remembers the deleted runs, so a tester that still keeps one does not bring it back.
+         * FRUNAMI remembers the deleted runs, so a tester that still keeps one does not bring it back.
          * @summary Delete finished runs from the history
          * @param {TesterHistoryDeleteRequest} testerHistoryDeleteRequest 
          * @param {*} [options] Override http request option.
@@ -3748,7 +3748,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * fru-lab keeps the last 50 runs fru-tester finished.
+         * FRUNAMI keeps the last 50 runs frunami-tester finished.
          * @summary Finished runs, newest first
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3787,8 +3787,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Forwarded to fru-tester. Every link on the host where fru-tester runs, for the Setup page\'s interface menus.
-         * @summary Interfaces on fru-tester\'s host
+         * Forwarded to frunami-tester. Every link on the host where frunami-tester runs, for the Setup page\'s interface menus.
+         * @summary Interfaces on frunami-tester\'s host
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -3799,7 +3799,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Forwarded to fru-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR\'s prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF\'s N3 or the UPF\'s N6 three times, and removes the address again. Only that network\'s fields are checked. Not while a run is active.
+         * Forwarded to frunami-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR\'s prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF\'s N3 or the UPF\'s N6 three times, and removes the address again. Only that network\'s fields are checked. Not while a run is active.
          * @summary Ping test of one network
          * @param {TesterPingRequest} testerPingRequest 
          * @param {*} [options] Override http request option.
@@ -3877,7 +3877,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Forwarded to fru-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
+         * Forwarded to frunami-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
          * @summary Validate a profile and preview the per-gNB plan
          * @param {TesterProfile} testerProfile 
          * @param {*} [options] Override http request option.
@@ -3890,7 +3890,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Forwarded to fru-tester. State is `idle` before the first run.
+         * Forwarded to frunami-tester. State is `idle` before the first run.
          * @summary Current run snapshot
          * @param {number} [gnbOffset] Where the page of gNBs starts, counted within those gnbState keeps.
          * @param {number} [gnbLimit] How many gNBs to list (0–1000); absent lists every gNB. The run stream takes the same three parameters, and its client changes page by sending {\&quot;gnbOffset\&quot;, \&quot;gnbLimit\&quot;, \&quot;gnbState\&quot;} as a text message.
@@ -3905,7 +3905,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Forwarded to fru-tester. Only one run may be active at a time.
+         * Forwarded to frunami-tester. Only one run may be active at a time.
          * @summary Start a run
          * @param {TesterProfile} testerProfile 
          * @param {*} [options] Override http request option.
@@ -3918,7 +3918,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Stops the traffic, deregisters every registered UE, closes every N2 association and removes what fru-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
+         * Stops the traffic, deregisters every registered UE, closes every N2 association and removes what frunami-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
          * @summary Stop the active run
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3930,7 +3930,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Forwarded to fru-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when fru-tester runs in a container), load average and the capabilities a run needs. A 502 means fru-lab could not reach fru-tester.
+         * Forwarded to frunami-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when frunami-tester runs in a container), load average and the capabilities a run needs. A 502 means FRUNAMI could not reach frunami-tester.
          * @summary The tester host and process (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3942,7 +3942,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Forwarded to fru-tester, which reads /proc/stat. The whole host\'s load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
+         * Forwarded to frunami-tester, which reads /proc/stat. The whole host\'s load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
          * @summary How busy each CPU of the tester host is (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3954,7 +3954,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Forwarded to fru-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
+         * Forwarded to frunami-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
          * @summary Set the CPU allocation for the next runs
          * @param {TesterCpuAllocation} testerCpuAllocation 
          * @param {*} [options] Override http request option.
@@ -3967,7 +3967,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Forwarded to fru-tester. cpus is what the next run uses; topology helps choose it.
+         * Forwarded to frunami-tester. cpus is what the next run uses; topology helps choose it.
          * @summary The tester host\'s CPU allocation and layout (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3979,7 +3979,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * fru-lab first asks the tester for its /api/status with the token; it is kept only if it answers.
+         * FRUNAMI first asks the tester for its /api/status with the token; it is kept only if it answers.
          * @summary Add a tester
          * @param {TesterAddRequest} testerAddRequest 
          * @param {*} [options] Override http request option.
@@ -3992,7 +3992,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Only fru-lab forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
+         * Only FRUNAMI forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
          * @summary Remove an added tester
          * @param {string} id A tester from GET /api/testers; \&quot;default\&quot; is the one in config.yaml.
          * @param {*} [options] Override http request option.
@@ -4006,7 +4006,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * The tester in config.yaml (backend.tester, id \"default\", builtIn) first, then the ones added here. API tokens are never returned; each tester\'s name comes from its own status.
-         * @summary Every tester fru-lab can reach (Status page)
+         * @summary Every tester FRUNAMI can reach (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4239,7 +4239,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.logout(options).then((request) => request(axios, basePath));
         },
         /**
-         * Forwarded to fru-tester. State is `idle` before the first bench.
+         * Forwarded to frunami-tester. State is `idle` before the first bench.
          * @summary Latest data plane bench
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4248,7 +4248,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerBenchGet(options).then((request) => request(axios, basePath));
         },
         /**
-         * Measures how fast this host\'s fru-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
+         * Measures how fast this host\'s frunami-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
          * @summary Start a data plane bench
          * @param {TesterBenchSettings} testerBenchSettings 
          * @param {*} [options] Override http request option.
@@ -4386,7 +4386,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerByIdSystem(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * fru-lab remembers the deleted runs, so a tester that still keeps one does not bring it back.
+         * FRUNAMI remembers the deleted runs, so a tester that still keeps one does not bring it back.
          * @summary Delete finished runs from the history
          * @param {TesterHistoryDeleteRequest} testerHistoryDeleteRequest 
          * @param {*} [options] Override http request option.
@@ -4406,7 +4406,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerHistoryGet(runId, options).then((request) => request(axios, basePath));
         },
         /**
-         * fru-lab keeps the last 50 runs fru-tester finished.
+         * FRUNAMI keeps the last 50 runs frunami-tester finished.
          * @summary Finished runs, newest first
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4436,8 +4436,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerHistoryReportHtml(runId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Forwarded to fru-tester. Every link on the host where fru-tester runs, for the Setup page\'s interface menus.
-         * @summary Interfaces on fru-tester\'s host
+         * Forwarded to frunami-tester. Every link on the host where frunami-tester runs, for the Setup page\'s interface menus.
+         * @summary Interfaces on frunami-tester\'s host
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4445,7 +4445,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerNetworkInterfaces(options).then((request) => request(axios, basePath));
         },
         /**
-         * Forwarded to fru-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR\'s prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF\'s N3 or the UPF\'s N6 three times, and removes the address again. Only that network\'s fields are checked. Not while a run is active.
+         * Forwarded to frunami-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR\'s prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF\'s N3 or the UPF\'s N6 three times, and removes the address again. Only that network\'s fields are checked. Not while a run is active.
          * @summary Ping test of one network
          * @param {TesterPingRequest} testerPingRequest 
          * @param {*} [options] Override http request option.
@@ -4505,7 +4505,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerProfileUpdate(id, testerProfile, options).then((request) => request(axios, basePath));
         },
         /**
-         * Forwarded to fru-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
+         * Forwarded to frunami-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
          * @summary Validate a profile and preview the per-gNB plan
          * @param {TesterProfile} testerProfile 
          * @param {*} [options] Override http request option.
@@ -4515,7 +4515,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerProfileValidate(testerProfile, options).then((request) => request(axios, basePath));
         },
         /**
-         * Forwarded to fru-tester. State is `idle` before the first run.
+         * Forwarded to frunami-tester. State is `idle` before the first run.
          * @summary Current run snapshot
          * @param {number} [gnbOffset] Where the page of gNBs starts, counted within those gnbState keeps.
          * @param {number} [gnbLimit] How many gNBs to list (0–1000); absent lists every gNB. The run stream takes the same three parameters, and its client changes page by sending {\&quot;gnbOffset\&quot;, \&quot;gnbLimit\&quot;, \&quot;gnbState\&quot;} as a text message.
@@ -4527,7 +4527,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerRunGet(gnbOffset, gnbLimit, gnbState, options).then((request) => request(axios, basePath));
         },
         /**
-         * Forwarded to fru-tester. Only one run may be active at a time.
+         * Forwarded to frunami-tester. Only one run may be active at a time.
          * @summary Start a run
          * @param {TesterProfile} testerProfile 
          * @param {*} [options] Override http request option.
@@ -4537,7 +4537,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerRunStart(testerProfile, options).then((request) => request(axios, basePath));
         },
         /**
-         * Stops the traffic, deregisters every registered UE, closes every N2 association and removes what fru-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
+         * Stops the traffic, deregisters every registered UE, closes every N2 association and removes what frunami-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
          * @summary Stop the active run
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4546,7 +4546,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerRunStop(options).then((request) => request(axios, basePath));
         },
         /**
-         * Forwarded to fru-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when fru-tester runs in a container), load average and the capabilities a run needs. A 502 means fru-lab could not reach fru-tester.
+         * Forwarded to frunami-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when frunami-tester runs in a container), load average and the capabilities a run needs. A 502 means FRUNAMI could not reach frunami-tester.
          * @summary The tester host and process (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4555,7 +4555,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerStatusGet(options).then((request) => request(axios, basePath));
         },
         /**
-         * Forwarded to fru-tester, which reads /proc/stat. The whole host\'s load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
+         * Forwarded to frunami-tester, which reads /proc/stat. The whole host\'s load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
          * @summary How busy each CPU of the tester host is (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4564,7 +4564,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerSystemCpuLoad(options).then((request) => request(axios, basePath));
         },
         /**
-         * Forwarded to fru-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
+         * Forwarded to frunami-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
          * @summary Set the CPU allocation for the next runs
          * @param {TesterCpuAllocation} testerCpuAllocation 
          * @param {*} [options] Override http request option.
@@ -4574,7 +4574,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerSystemCpusPut(testerCpuAllocation, options).then((request) => request(axios, basePath));
         },
         /**
-         * Forwarded to fru-tester. cpus is what the next run uses; topology helps choose it.
+         * Forwarded to frunami-tester. cpus is what the next run uses; topology helps choose it.
          * @summary The tester host\'s CPU allocation and layout (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4583,7 +4583,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testerSystemGet(options).then((request) => request(axios, basePath));
         },
         /**
-         * fru-lab first asks the tester for its /api/status with the token; it is kept only if it answers.
+         * FRUNAMI first asks the tester for its /api/status with the token; it is kept only if it answers.
          * @summary Add a tester
          * @param {TesterAddRequest} testerAddRequest 
          * @param {*} [options] Override http request option.
@@ -4593,7 +4593,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.testersAdd(testerAddRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Only fru-lab forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
+         * Only FRUNAMI forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
          * @summary Remove an added tester
          * @param {string} id A tester from GET /api/testers; \&quot;default\&quot; is the one in config.yaml.
          * @param {*} [options] Override http request option.
@@ -4604,7 +4604,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * The tester in config.yaml (backend.tester, id \"default\", builtIn) first, then the ones added here. API tokens are never returned; each tester\'s name comes from its own status.
-         * @summary Every tester fru-lab can reach (Status page)
+         * @summary Every tester FRUNAMI can reach (Status page)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4854,7 +4854,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Forwarded to fru-tester. State is `idle` before the first bench.
+     * Forwarded to frunami-tester. State is `idle` before the first bench.
      * @summary Latest data plane bench
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4864,7 +4864,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Measures how fast this host\'s fru-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
+     * Measures how fast this host\'s frunami-tester can send, over loopback with no core network, with 1, 2, 4 … senders up to one per CPU. Not while a run is active.
      * @summary Start a data plane bench
      * @param {TesterBenchSettings} testerBenchSettings 
      * @param {*} [options] Override http request option.
@@ -5015,7 +5015,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * fru-lab remembers the deleted runs, so a tester that still keeps one does not bring it back.
+     * FRUNAMI remembers the deleted runs, so a tester that still keeps one does not bring it back.
      * @summary Delete finished runs from the history
      * @param {TesterHistoryDeleteRequest} testerHistoryDeleteRequest 
      * @param {*} [options] Override http request option.
@@ -5037,7 +5037,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * fru-lab keeps the last 50 runs fru-tester finished.
+     * FRUNAMI keeps the last 50 runs frunami-tester finished.
      * @summary Finished runs, newest first
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5070,8 +5070,8 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Forwarded to fru-tester. Every link on the host where fru-tester runs, for the Setup page\'s interface menus.
-     * @summary Interfaces on fru-tester\'s host
+     * Forwarded to frunami-tester. Every link on the host where frunami-tester runs, for the Setup page\'s interface menus.
+     * @summary Interfaces on frunami-tester\'s host
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -5080,7 +5080,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Forwarded to fru-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR\'s prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF\'s N3 or the UPF\'s N6 three times, and removes the address again. Only that network\'s fields are checked. Not while a run is active.
+     * Forwarded to frunami-tester. Puts the address a run would add for that network on its interface (the first gNB IP with the CIDR\'s prefix for N2 and N3, the sink for N6) unless the host has it, pings the AMF, the UPF\'s N3 or the UPF\'s N6 three times, and removes the address again. Only that network\'s fields are checked. Not while a run is active.
      * @summary Ping test of one network
      * @param {TesterPingRequest} testerPingRequest 
      * @param {*} [options] Override http request option.
@@ -5146,7 +5146,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Forwarded to fru-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
+     * Forwarded to frunami-tester. Always 200 for a well-formed body; `valid` says whether the profile can start a run.
      * @summary Validate a profile and preview the per-gNB plan
      * @param {TesterProfile} testerProfile 
      * @param {*} [options] Override http request option.
@@ -5157,7 +5157,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Forwarded to fru-tester. State is `idle` before the first run.
+     * Forwarded to frunami-tester. State is `idle` before the first run.
      * @summary Current run snapshot
      * @param {number} [gnbOffset] Where the page of gNBs starts, counted within those gnbState keeps.
      * @param {number} [gnbLimit] How many gNBs to list (0–1000); absent lists every gNB. The run stream takes the same three parameters, and its client changes page by sending {\&quot;gnbOffset\&quot;, \&quot;gnbLimit\&quot;, \&quot;gnbState\&quot;} as a text message.
@@ -5170,7 +5170,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Forwarded to fru-tester. Only one run may be active at a time.
+     * Forwarded to frunami-tester. Only one run may be active at a time.
      * @summary Start a run
      * @param {TesterProfile} testerProfile 
      * @param {*} [options] Override http request option.
@@ -5181,7 +5181,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Stops the traffic, deregisters every registered UE, closes every N2 association and removes what fru-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
+     * Stops the traffic, deregisters every registered UE, closes every N2 association and removes what frunami-tester added. During that cleanup (`stopping`), a second call skips the deregistrations still pending. Returns at once; watch the stream for `stopped`.
      * @summary Stop the active run
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5191,7 +5191,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Forwarded to fru-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when fru-tester runs in a container), load average and the capabilities a run needs. A 502 means fru-lab could not reach fru-tester.
+     * Forwarded to frunami-tester. Host name, build, uptime, memory (host, process, and the cgroup limit when frunami-tester runs in a container), load average and the capabilities a run needs. A 502 means FRUNAMI could not reach frunami-tester.
      * @summary The tester host and process (Status page)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5201,7 +5201,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Forwarded to fru-tester, which reads /proc/stat. The whole host\'s load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
+     * Forwarded to frunami-tester, which reads /proc/stat. The whole host\'s load per CPU, kernel time included, over the interval since the previous read (at least half a second; readers polling together share one measurement). Readable during a run.
      * @summary How busy each CPU of the tester host is (Status page)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5211,7 +5211,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Forwarded to fru-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
+     * Forwarded to frunami-tester, which keeps it in a file on its host. Empty lists leave that side unpinned. Refused while a run is active - the allocation is fixed before a run.
      * @summary Set the CPU allocation for the next runs
      * @param {TesterCpuAllocation} testerCpuAllocation 
      * @param {*} [options] Override http request option.
@@ -5222,7 +5222,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Forwarded to fru-tester. cpus is what the next run uses; topology helps choose it.
+     * Forwarded to frunami-tester. cpus is what the next run uses; topology helps choose it.
      * @summary The tester host\'s CPU allocation and layout (Status page)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5232,7 +5232,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * fru-lab first asks the tester for its /api/status with the token; it is kept only if it answers.
+     * FRUNAMI first asks the tester for its /api/status with the token; it is kept only if it answers.
      * @summary Add a tester
      * @param {TesterAddRequest} testerAddRequest 
      * @param {*} [options] Override http request option.
@@ -5243,7 +5243,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Only fru-lab forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
+     * Only FRUNAMI forgets it; the tester keeps running. The tester in config.yaml cannot be removed (409).
      * @summary Remove an added tester
      * @param {string} id A tester from GET /api/testers; \&quot;default\&quot; is the one in config.yaml.
      * @param {*} [options] Override http request option.
@@ -5255,7 +5255,7 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * The tester in config.yaml (backend.tester, id \"default\", builtIn) first, then the ones added here. API tokens are never returned; each tester\'s name comes from its own status.
-     * @summary Every tester fru-lab can reach (Status page)
+     * @summary Every tester FRUNAMI can reach (Status page)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */

@@ -1,15 +1,15 @@
-# fru-lab Helm chart
+# frunami Helm chart
 
-Deploys the fru-lab web console and the fru-tester throughput tester into
+Deploys the frunami web console and the frunami-tester throughput tester into
 Kubernetes.
 
 ```bash
 cd helm
-helm install frulab .                     # defaults: see values.yaml
-helm install frulab . -f my-values.yaml   # your masters, node, CPUs
+helm install frunami .                     # defaults: see values.yaml
+helm install frunami . -f my-values.yaml   # your masters, node, CPUs
 ```
 
-Browse to `http://<node IP>:30888` (login `admin` / `frulab`).
+Browse to `http://<node IP>:30888` (login `admin` / `frunami`).
 
 ## Before installing
 
@@ -29,7 +29,7 @@ same masters in bridge mode reaches them directly; a pod on the node's own
 network could not, since a macvlan master cannot talk to its children.
 
 - Profiles use `n2`, `n3` and `n6` as their interface names.
-- The NADs have no IPAM: fru-tester adds each run's gNB IPs and sink IP itself
+- The NADs have no IPAM: frunami-tester adds each run's gNB IPs and sink IP itself
   and removes them afterwards. Keep the profiles' gNB ranges out of the 5GC's
   IPAM ranges.
 - On macvlan the data plane uses UDP sockets. AF_XDP needs a NIC (for
@@ -48,13 +48,13 @@ Guaranteed QoS (equal integer cpu requests and limits in `tester.resources`).
 
 ## Data
 
-`frulab.persistence.type` (fru-lab's database) and `tester.persistence.type`
+`frunami.persistence.type` (frunami's database) and `tester.persistence.type`
 (the tester's CPU allocation) are each `hostPath` (default, under
-`/var/lib/frulab`), `pvc` or `emptyDir`.
+`/var/lib/frunami`), `pvc` or `emptyDir`.
 PVCs are kept on `helm uninstall`.
 
 ## free5GC deploy pages
 
-fru-lab's own free5GC/gNB/UE deploy pages need a Docker daemon. They are off
-by default; `frulab.docker.enabled: true` mounts the node's Docker socket and
-needs `frulab.docker.webconsoleHost` (the node's IP).
+frunami's own free5GC/gNB/UE deploy pages need a Docker daemon. They are off
+by default; `frunami.docker.enabled: true` mounts the node's Docker socket and
+needs `frunami.docker.webconsoleHost` (the node's IP).

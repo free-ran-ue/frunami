@@ -1,20 +1,20 @@
-{{- define "frulab.labels" -}}
-app.kubernetes.io/part-of: frulab
+{{- define "frunami.labels" -}}
+app.kubernetes.io/part-of: frunami
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 {{- end }}
 
-{{- define "frulab.name" -}}{{ .Release.Name }}-frulab{{- end }}
+{{- define "frunami.name" -}}{{ .Release.Name }}-frunami{{- end }}
 {{- define "tester.name" -}}{{ .Release.Name }}-tester{{- end }}
 
-{{- define "frulab.selector" -}}
-app.kubernetes.io/name: frulab
+{{- define "frunami.selector" -}}
+app.kubernetes.io/name: frunami
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- define "tester.selector" -}}
-app.kubernetes.io/name: fru-tester
+app.kubernetes.io/name: frunami-tester
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
@@ -29,7 +29,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/* a data volume: (dict "name" "db" "p" .Values.x.persistence "claim" "...") */}}
-{{- define "frulab.volume" -}}
+{{- define "frunami.volume" -}}
 - name: {{ .name }}
 {{- if eq .p.type "hostPath" }}
   hostPath:
@@ -45,13 +45,13 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end }}
 
-{{- define "frulab.pvc" -}}
+{{- define "frunami.pvc" -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ .claim }}
   labels:
-    {{- include "frulab.labels" .root | nindent 4 }}
+    {{- include "frunami.labels" .root | nindent 4 }}
   annotations:
     helm.sh/resource-policy: keep
 spec:

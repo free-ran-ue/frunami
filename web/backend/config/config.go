@@ -27,7 +27,7 @@ type BackendIE struct {
 	Tester TesterIE `yaml:"tester"`
 }
 
-// TesterIE points at the fru-tester engine. Leaving URL empty disables the
+// TesterIE points at the frunami-tester engine. Leaving URL empty disables the
 // Throughput Tester pages' backend routes (they answer 503).
 type TesterIE struct {
 	URL      string `yaml:"url"`
@@ -53,10 +53,10 @@ type DeployIE struct {
 	Webconsole WebconsoleIE `yaml:"webconsole"`
 }
 
-// WebconsoleIE says where fru-lab publishes the webconsole: on Port (0 = 5000), and
+// WebconsoleIE says where frunami publishes the webconsole: on Port (0 = 5000), and
 // reaches it at Host:Port (Host empty = localhost; host.docker.internal
-// when fru-lab itself runs in a container). The browser never talks to
-// the webconsole directly: fru-lab proxies it under /api/webconsole.
+// when frunami itself runs in a container). The browser never talks to
+// the webconsole directly: frunami proxies it under /api/webconsole.
 type WebconsoleIE struct {
 	Port int    `yaml:"port"`
 	Host string `yaml:"host"`

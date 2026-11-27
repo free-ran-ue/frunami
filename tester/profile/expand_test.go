@@ -180,7 +180,7 @@ func TestExpandValidatesTrafficAndN6(t *testing.T) {
 	}, verr.Errors)
 }
 
-// fru-lab's core puts N2, N3 and N6 on one bridge: the sink and the UPF's
+// frunami's core puts N2, N3 and N6 on one bridge: the sink and the UPF's
 // N6 address must never be handed to a gNB.
 func TestExpandNeverAllocatesTheSinkOrUpfN6IP(t *testing.T) {
 	p := sampleProfile()

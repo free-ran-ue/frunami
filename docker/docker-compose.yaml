@@ -1,32 +1,32 @@
 services:
-  fru-lab:
-    container_name: fru-lab
-    image: alonza0314/fru-lab:latest
-    command: ./fru-lab -c config.yaml
+  frunami:
+    container_name: frunami
+    image: alonza0314/frunami:latest
+    command: ./frunami -c config.yaml
     expose:
       - "8888"
     ports:
       - "8888:8888"
     volumes:
-      - ./config.yaml:/frulab/config.yaml
-      - /var/lib/frulab/db:/frulab/db
-      # fru-lab deploys free5gc/gNB/UE by talking to this same Docker
+      - ./config.yaml:/frunami/config.yaml
+      - /var/lib/frunami/db:/frunami/db
+      # frunami deploys free5gc/gNB/UE by talking to this same Docker
       # daemon (via the socket below), not a nested one - so any compose
       # file/config it materializes under deploy.workDir has to resolve to
       # the SAME path on the host as it does inside this container, or the
       # daemon can't find the files it's told to bind-mount into those
       # containers. Keep this path identical on both sides of the ":" if
       # you change it, and match config.yaml's deploy.workDir to it.
-      - /var/lib/frulab/deploy:/var/lib/frulab/deploy
+      - /var/lib/frunami/deploy:/var/lib/frunami/deploy
       - /var/run/docker.sock:/var/run/docker.sock
     extra_hosts:
-      # fru-tester runs on the host network; this name reaches the host
+      # frunami-tester runs on the host network; this name reaches the host
       - "host.docker.internal:host-gateway"
 
-  fru-tester:
-    container_name: fru-tester
-    image: alonza0314/fru-tester:latest
-    command: ./fru-tester -c tester.yaml
+  frunami-tester:
+    container_name: frunami-tester
+    image: alonza0314/frunami-tester:latest
+    command: ./frunami-tester -c tester.yaml
     # host network: gNB IPs are added to host interfaces and SCTP to the
     # AMF leaves from them. NET_ADMIN is for adding/removing those IPs.
     # The sctp kernel module must be loaded on the host (modprobe sctp).
@@ -42,6 +42,6 @@ services:
       - BPF
       - IPC_LOCK
     volumes:
-      - ./tester.yaml:/frutester/tester.yaml
+      - ./tester.yaml:/frunami-tester/tester.yaml
       # the Testers page's CPU allocation (systemFile in tester.yaml)
-      - ./frutester-data:/frutester/data
+      - ./frunami-tester-data:/frunami-tester/data

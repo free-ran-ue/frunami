@@ -7,13 +7,13 @@
 #   ./build_image.sh <image tag>
 #
 # Description:
-#   This script builds the docker images for fru-lab and fru-tester.
+#   This script builds the docker images frunami (frunami) and frunami-tester (frunami-tester).
 #   The image tag is the name of the image to be built, default is latest.
 ########################################################
 
 LATEST_TAG="latest"
-IMAGE_NAME="alonza0314/fru-lab"
-TESTER_IMAGE_NAME="alonza0314/fru-tester"
+IMAGE_NAME="alonza0314/frunami"
+TESTER_IMAGE_NAME="alonza0314/frunami-tester"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # the Dockerfile COPYs web/backend and web/frontend, so the build context has
@@ -26,7 +26,7 @@ build_docker_image() {
         return 1
     fi
     if ! docker build -f ${SCRIPT_DIR}/tester.Dockerfile -t $TESTER_IMAGE_NAME:$image_tag ${REPO_ROOT}; then
-        echo "Failed to build the fru-tester docker image"
+        echo "Failed to build the frunami-tester docker image"
         return 1
     fi
 }

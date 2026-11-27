@@ -171,7 +171,7 @@ export default function TesterSetupPage() {
   const { testers } = useTesters()
   const testerId = profile.testerId || DEFAULT_TESTER_ID
   const tester = testers?.find((t) => t.id === testerId)
-  // false: the profile's tester was removed from fru-lab
+  // false: the profile's tester was removed from FRUNAMI
   const testerKnown = testers === null ? null : tester !== undefined
 
   const loadInterfaces = useCallback(() => {
@@ -460,7 +460,7 @@ export default function TesterSetupPage() {
         <span>Tester</span>
         <select aria-label="Tester to run on"
           value={testerId} disabled={isLoading || testers === null}
-          title={tester ? `Run on ${tester.name} (${tester.url}); saved with the profile` : "This profile's tester was removed from fru-lab: choose another"}
+          title={tester ? `Run on ${tester.name} (${tester.url}); saved with the profile` : "This profile's tester was removed from FRUNAMI: choose another"}
           onChange={(e) => handleChange('testerId', e.target.value)}>
           {testerKnown === false && <option value={testerId}>Removed tester</option>}
           {testers === null && <option value={testerId}>Loading testers…</option>}
@@ -486,7 +486,7 @@ export default function TesterSetupPage() {
       headerActions={headerActions}
       overlay={<NotificationContainer errors={errors} successes={successes} onClose={removeNotification} />}>
       {testerKnown === false && !isLoading && (
-        <p className={styles.runError}>This profile&apos;s tester was removed from fru-lab: choose another one next to Start run.</p>
+        <p className={styles.runError}>This profile&apos;s tester was removed from FRUNAMI: choose another one next to Start run.</p>
       )}
 
       <div className={styles.cols}>
@@ -649,7 +649,7 @@ export default function TesterSetupPage() {
                   <Field label="AMF IP" path="network.n2.amfIp" {...fieldProps} />
                   <Field label="AMF port" path="network.n2.amfPort" numeric {...fieldProps} />
                 </>
-              ), 'fru-tester adds one IP per gNB to this interface when the run starts and removes them when it stops. IPs already on the host and the AMF IP are skipped.', 'Ping AMF')}
+              ), 'frunami-tester adds one IP per gNB to this interface when the run starts and removes them when it stops. IPs already on the host and the AMF IP are skipped.', 'Ping AMF')}
 
               {network('n3', 'N3', 'gNB ↔ UPF', (
                 <>

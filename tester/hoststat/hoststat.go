@@ -1,5 +1,5 @@
-// Package hoststat reports the state of the host fru-tester runs on and of
-// the fru-tester process itself: what the Status page shows next to the
+// Package hoststat reports the state of the host frunami-tester runs on and of
+// the frunami-tester process itself: what the Status page shows next to the
 // CPU allocation.
 package hoststat
 
@@ -35,7 +35,7 @@ type Status struct {
 }
 
 // Memory is the host's memory, the process's, and the limit of the cgroup
-// fru-tester is in (a container's), if it has one.
+// frunami-tester is in (a container's), if it has one.
 type Memory struct {
 	HostTotal     uint64 `json:"hostTotal"`
 	HostAvailable uint64 `json:"hostAvailable"`
@@ -43,11 +43,11 @@ type Memory struct {
 	GoHeap        uint64 `json:"goHeap"`
 	// CgroupLimit is nil when the cgroup sets no memory limit.
 	CgroupLimit *uint64 `json:"cgroupLimit"`
-	// CgroupUsage is nil when fru-tester's cgroup cannot be read.
+	// CgroupUsage is nil when frunami-tester's cgroup cannot be read.
 	CgroupUsage *uint64 `json:"cgroupUsage"`
 }
 
-// Cpu counts the host's CPUs and the ones fru-tester may use, with the
+// Cpu counts the host's CPUs and the ones frunami-tester may use, with the
 // host's load average.
 type Cpu struct {
 	Online     int     `json:"online"`
@@ -170,7 +170,7 @@ func readMemory() Memory {
 // LONG_MAX); anything this large is no limit.
 const unlimited = 1 << 62
 
-// cgroupMemory reads the memory limit and usage of fru-tester's cgroup:
+// cgroupMemory reads the memory limit and usage of frunami-tester's cgroup:
 // cgroup v2 under the path /proc/self/cgroup gives (or the namespace root,
 // as a container sees it), else cgroup v1's memory controller.
 func cgroupMemory() (limit, usage *uint64) {

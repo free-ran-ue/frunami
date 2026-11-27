@@ -3,7 +3,7 @@ package context
 import "fmt"
 
 var (
-	DefaultDbPath = "/tmp/frulab_default.db"
+	DefaultDbPath = "/tmp/frunami_default.db"
 )
 
 var (

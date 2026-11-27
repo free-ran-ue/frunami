@@ -3,7 +3,7 @@ import type { Subscription } from '../../webconsoleApi'
 import { fromSubscription } from '../subscribers/subscriberForm'
 
 // Derives the fields a UE instance's config needs straight from a webconsole
-// Subscription - the fru-lab backend never talks to webconsole itself, so
+// Subscription - the FRUNAMI backend never talks to webconsole itself, so
 // this conversion always happens here, in the browser.
 export function subscriptionToUeDeployRequest(subscription: Subscription): DeployUeRequest {
   const form = fromSubscription(subscription)

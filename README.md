@@ -1,13 +1,13 @@
-# fru Lab
+# FRUNAMI
 
-![frulab](./docs/images/frulab-logo.png)
+![FRUNAMI: Large-Scale RAN/UE Traffic Simulator](./assets/frunami-main.png)
 
 Deploy and monitor the free5GC core network and the free-ran-ue gNB / UE simulator, and load-test a 5G core with the Throughput Tester.
 
-fru-lab has two parts:
+FRUNAMI has two parts:
 
-- **fru-lab**, the web console (Go backend + React frontend). It deploys free5GC, the gNB and one UE container per subscriber on the host's Docker daemon, manages subscribers through the free5GC webconsole, and shows logs and images.
-- **fru-tester**, the Throughput Tester. It simulates gNBs and tens of thousands of UEs against any 5G core (N2 setup, registration, PDU sessions) and drives GTP-U traffic through it. fru-lab's "Load testing" pages talk to one or more fru-testers over their API.
+- **frunami**, the web console (Go backend + React frontend). It deploys free5GC, the gNB and one UE container per subscriber on the host's Docker daemon, manages subscribers through the free5GC webconsole, and shows logs and images.
+- **frunami-tester**, the Throughput Tester. It simulates gNBs and tens of thousands of UEs against any 5G core (N2 setup, registration, PDU sessions) and drives GTP-U traffic through it. frunami's "Load testing" pages talk to one or more frunami-testers over their API.
 
 ## Develop Environment
 
@@ -34,34 +34,32 @@ fru-lab has two parts:
 | Clean | `make clean` |
 | Generate frontend openapi | `make openapi` |
 | Generate frontend openapi for free5GC webconsole | `make openapi-webconsole` |
-| Docker images (fru-lab and fru-tester) | `make docker` |
+| Docker images (`frunami` and `frunami-tester`) | `make docker` |
 
-`make run` starts fru-lab with `./config.yaml` on port `8888`. `make run-tester` loads the `sctp` kernel module and starts fru-tester with `./tester.yaml` under `sudo` (it needs root to add gNB IPs and open SCTP).
+`make run` starts frunami with `./config.yaml` on port `8888`. `make run-tester` loads the `sctp` kernel module and starts frunami-tester with `./tester.yaml` under `sudo` (it needs root to add gNB IPs and open SCTP).
 
 ## Throughput Tester
 
-fru-tester is built with `make tester` and started with `make run-tester`. fru-lab finds it through `backend.tester` in `config.yaml`:
+frunami-tester is built with `make tester` and started with `make run-tester`. frunami finds it through `backend.tester` in `config.yaml`:
 
 ```yaml
 tester:
-  # fru-tester API (see tester.yaml). Leave url empty to disable the pages.
+  # frunami-tester API (see tester.yaml). Leave url empty to disable the pages.
   url: "http://127.0.0.1:9100"
-  apiToken: "frulab-tester"
+  apiToken: "frunami-tester"
 ```
 
 `apiToken` must match `apiToken` in `tester.yaml`. More testers can be added from the Testers page.
 
-See the [fru-lab guide](docs/guide.html) (Chinese) for setting up testers, running tests and reading the results.
-
 ## Install - Docker Compose
 
-The compose file runs two containers: `fru-lab` and `fru-tester`. fru-lab deploys free5GC/gNB/UE by talking to the host's Docker daemon, so its container needs the host's Docker socket mounted in, on top of the usual config/db volumes. fru-tester runs on the host network.
+The compose file runs two containers: `frunami` and `frunami-tester`. frunami deploys free5GC/gNB/UE by talking to the host's Docker daemon, so its container needs the host's Docker socket mounted in, on top of the usual config/db volumes. frunami-tester runs on the host network.
 
 1. Download the compose files
 
     ```bash
-    git clone https://github.com/free-ran-ue/fru-lab.git
-    cd fru-lab/docker
+    git clone https://github.com/free-ran-ue/frunami.git
+    cd frunami/docker
     ```
 
 2. Check the config
@@ -70,14 +68,14 @@ The compose file runs two containers: `fru-lab` and `fru-tester`. fru-lab deploy
 
     ```yaml
     username: "admin"
-    password: "frulab"
+    password: "frunami"
     ```
 
-    For other settings, make sure the change is reflected in `docker-compose.yaml` too. In particular, `deploy.workDir` has to stay the exact same path on the host and inside the container (see the comment on that volume in `docker-compose.yaml`) - fru-lab hands that path to the host's Docker daemon when it deploys free5GC/gNB/UE, so it has to resolve to the same place on both sides.
+    For other settings, make sure the change is reflected in `docker-compose.yaml` too. In particular, `deploy.workDir` has to stay the exact same path on the host and inside the container (see the comment on that volume in `docker-compose.yaml`) - frunami hands that path to the host's Docker daemon when it deploys free5GC/gNB/UE, so it has to resolve to the same place on both sides.
 
-    fru-tester's settings are in `tester.yaml`. Its `apiToken` must match `backend.tester.apiToken` in `config.yaml`.
+    frunami-tester's settings are in `tester.yaml`. Its `apiToken` must match `backend.tester.apiToken` in `config.yaml`.
 
-3. Load SCTP on the host (fru-tester needs it)
+3. Load SCTP on the host (frunami-tester needs it)
 
     ```bash
     sudo modprobe sctp
@@ -89,7 +87,7 @@ The compose file runs two containers: `fru-lab` and `fru-tester`. fru-lab deploy
     docker compose up -d
     ```
 
-    Open `http://<host IP>:8888`. The default db is stored at `/var/lib/frulab/db` and deploy state at `/var/lib/frulab/deploy`, both mounted in the compose file. fru-tester keeps its CPU allocation in `./frutester-data`.
+    Open `http://<host IP>:8888`. The default db is stored at `/var/lib/frunami/db` and deploy state at `/var/lib/frunami/deploy`, both mounted in the compose file. frunami-tester keeps its CPU allocation in `./frunami-tester-data`.
 
 5. Down the compose
 
@@ -99,12 +97,4 @@ The compose file runs two containers: `fru-lab` and `fru-tester`. fru-lab deploy
 
 ## Install - Helm
 
-The chart in `helm/` deploys fru-lab and fru-tester to Kubernetes. See [helm/README.md](helm/README.md).
-
-## Guide
-
-[docs/guide.html](docs/guide.html) is the full user guide (in Chinese; open the file in a browser): deploying the core, subscribers, gNB and UEs, logs and images, and the Throughput Tester from the first run to tuning and troubleshooting.
-
-## TODO
-
-- Setup Script
+The chart in `helm/` deploys frunami and frunami-tester to Kubernetes. See [helm/README.md](helm/README.md).

@@ -30,8 +30,8 @@
   display: inline-flex; align-items: center; height: 2.125rem; padding: 0 0.625rem; color: var(--muted);
   background: var(--surface-sunken); border-right: 1px solid var(--border-strong);
 }
-.joinedError { border-color: var(--bad); }
-.joinedError > span { color: var(--bad-ink); background: var(--bad-bg); border-right-color: var(--bad); }
+.joinedError { border-color: var(--bad-ink); }
+.joinedError > span { color: var(--bad-ink); background: var(--bad-bg); border-right-color: var(--bad-ink); }
 .joined select {
   height: 2.125rem; max-width: 14rem; border: 0; padding: 0 1.75rem 0 0.625rem;
   font: 500 0.8125rem var(--font-sans); color: var(--ink); background: var(--surface); cursor: pointer;
@@ -84,7 +84,7 @@
 }
 .in:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
 .in:disabled { background: var(--surface-sunken); color: var(--muted); cursor: not-allowed; }
-.inError, .inError:focus { border-color: var(--bad); outline-color: var(--bad); }
+.inError, .inError:focus { border-color: var(--bad-ink); outline-color: var(--bad-ink); }
 .fieldError { margin: 0; color: var(--bad-ink); font-size: 0.75rem; font-weight: 500; }
 .fieldHint { margin: 0; color: var(--muted); font-size: 0.75rem; }
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }

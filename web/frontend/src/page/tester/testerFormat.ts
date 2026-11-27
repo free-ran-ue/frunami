@@ -39,7 +39,7 @@ export function formatLoss(rate: number): string {
 }
 
 // A browser WebSocket can't set an Authorization header, so the stream
-// takes the JWT as ?token= (checked by fru-lab's handleTesterStream),
+// takes the JWT as ?token= (checked by FRUNAMI's handleTesterStream),
 // mirroring dashboard/terminalSocket.ts.
 // query adds more parameters, e.g. the gNB page (see GnbPageRequest).
 export function buildTesterStreamUrl(testerId: string, query: Record<string, string | number> = {}): string {

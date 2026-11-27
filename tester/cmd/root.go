@@ -23,13 +23,13 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "fru-tester",
-	Short: "5G throughput tester engine (driven by fru-lab)",
+	Use:   "frunami-tester",
+	Short: "5G throughput tester engine (driven by frunami)",
 	RunE:  serve,
 }
 
 func init() {
-	rootCmd.Flags().StringP("config", "c", "tester.yaml", "path to fru-tester config")
+	rootCmd.Flags().StringP("config", "c", "tester.yaml", "path to frunami-tester config")
 }
 
 func Execute() {
@@ -60,7 +60,7 @@ func serve(cmd *cobra.Command, _ []string) error {
 
 	errCh := make(chan error, 1)
 	go func() { errCh <- srv.ListenAndServe() }()
-	mainLog.Infof("fru-tester %q listening on %s", cfg.TesterName, cfg.Listen)
+	mainLog.Infof("frunami-tester %q listening on %s", cfg.TesterName, cfg.Listen)
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)

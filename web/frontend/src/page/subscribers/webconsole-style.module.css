@@ -73,7 +73,7 @@
 .btnPrimary {
   border-color: var(--accent);
   background: var(--accent);
-  color: #FFFFFF;
+  color: var(--on-accent);
 }
 
 .btnPrimary:hover:not(:disabled) {
@@ -82,7 +82,7 @@
 }
 
 .btnDangerText {
-  color: var(--bad);
+  color: var(--bad-ink);
 }
 
 .btnSm {
@@ -247,7 +247,7 @@
 }
 
 .linkDanger {
-  color: var(--bad);
+  color: var(--bad-ink);
 }
 
 .link:hover:not(:disabled) {
@@ -391,7 +391,7 @@
 }
 
 .required {
-  color: var(--bad);
+  color: var(--bad-ink);
 }
 
 .inputPair {
@@ -432,7 +432,7 @@
 .hintError {
   margin: 0;
   font-size: 0.75rem;
-  color: var(--bad);
+  color: var(--bad-ink);
 }
 
 .checkboxRow {

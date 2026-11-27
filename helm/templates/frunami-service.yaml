@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "frunami.name" . }}
+  labels:
+    {{- include "frunami.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.frunami.service.type }}
+  selector:
+    {{- include "frunami.selector" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.frunami.service.port }}
+      targetPort: http
+      {{- if and (eq .Values.frunami.service.type "NodePort") .Values.frunami.service.nodePort }}
+      nodePort: {{ .Values.frunami.service.nodePort }}
+      {{- end }}

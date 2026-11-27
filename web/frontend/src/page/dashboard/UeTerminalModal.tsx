@@ -17,14 +17,16 @@ export default function UeTerminalModal({ instance, onClose }: UeTerminalModalPr
     if (!instance || !containerRef.current) return
 
     // xterm paints to a canvas, so it needs concrete colours rather than
-    // CSS variables - read the chrome token, falling back to its value.
+    // CSS variables - read the chrome tokens from index.css.
     const rootStyle = getComputedStyle(document.documentElement)
-    const chrome = rootStyle.getPropertyValue('--chrome').trim() || '#13122B'
+    const token = (name: string) => rootStyle.getPropertyValue(name).trim()
+    const chrome = token('--chrome')
+    const text = token('--chrome-text')
     const term = new Terminal({
       convertEol: true,
       fontSize: Math.round(13 * ((parseFloat(rootStyle.fontSize) || 16) / 16)),
       fontFamily: "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
-      theme: { background: chrome, foreground: '#D9D7F0', cursor: '#D9D7F0' },
+      theme: { background: chrome, foreground: text, cursor: text },
     })
     const fitAddon = new FitAddon()
     term.loadAddon(fitAddon)

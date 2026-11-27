@@ -17,7 +17,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// Several fru-testers can run on one host and share its interfaces. What
+// Several frunami-testers can run on one host and share its interfaces. What
 // one of them adds there that another may also use (the N6 sink, the UE
 // pool route) is claimed while in use, and only the last tester to let go
 // takes it off. A claim is an abstract unix socket: abstract names live in
@@ -25,8 +25,8 @@ import (
 // containers included, and a tester that dies drops its claims with it.
 
 const (
-	claimPrefix = "fru-tester/claim/"
-	lockName    = "fru-tester/lock"
+	claimPrefix = "frunami-tester/claim/"
+	lockName    = "frunami-tester/lock"
 	// lockWait bounds the wait for another tester's address change.
 	lockWait = 30 * time.Second
 )

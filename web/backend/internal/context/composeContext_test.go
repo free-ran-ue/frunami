@@ -84,7 +84,7 @@ func TestUpFailureTakesTheStackDownAndExplainsAPortConflict(t *testing.T) {
 	if err == nil {
 		t.Fatal("want an error")
 	}
-	if len(fake.downs) != 1 || fake.downs[0] != "frulab-free5gc" {
+	if len(fake.downs) != 1 || fake.downs[0] != "frunami-free5gc" {
 		t.Fatalf("downs %v; a failed deploy must not leave containers stuck in created", fake.downs)
 	}
 	for _, want := range []string{"port is already allocated", "deploy.webconsole.port"} {
@@ -109,7 +109,7 @@ func TestUpTimeoutTakesTheStackDown(t *testing.T) {
 	if time.Since(start) > 5*time.Second {
 		t.Fatal("Up did not give up at the timeout")
 	}
-	if len(fake.downs) != 1 || fake.downs[0] != "frulab-gnb" {
+	if len(fake.downs) != 1 || fake.downs[0] != "frunami-gnb" {
 		t.Fatalf("downs %v", fake.downs)
 	}
 	if fake.downCtx != nil {

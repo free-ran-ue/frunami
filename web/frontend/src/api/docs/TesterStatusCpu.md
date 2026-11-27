@@ -6,7 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **online** | **number** |  | [default to undefined]
-**allowed** | **number** | CPUs fru-tester may use. | [default to undefined]
+**allowed** | **number** | CPUs frunami-tester may use. | [default to undefined]
 **load1** | **number** |  | [default to undefined]
 **load5** | **number** |  | [default to undefined]
 **load15** | **number** |  | [default to undefined]

@@ -20,8 +20,8 @@ const runLabel = (r: TesterHistorySummary) => r.name || r.runId
 // HISTORY_PAGE is how many runs one page of the history shows.
 const HISTORY_PAGE = 20
 
-// TESTER_COLORS tell the testers apart in the table: accent, then violet.
-const TESTER_COLORS = ['var(--accent)', 'var(--violet)', 'var(--ok)', 'var(--warn)', 'var(--accent-ink)', 'var(--ink-2)']
+// TESTER_COLORS tell the testers apart in the table: chart-1 (blue), then chart-2 (teal).
+const TESTER_COLORS = ['var(--accent)', 'var(--chart-2)', 'var(--ok)', 'var(--warn)', 'var(--accent-ink)', 'var(--ink-2)']
 
 function seconds(r: TesterHistorySummary): number {
   if (!r.startedAt || !r.stoppedAt) return 0
@@ -56,8 +56,8 @@ const RESULTS: Record<Result, [string, string]> = {
   stopped: ['Stopped', ''],
 }
 
-// COMPARE_COLORS mark the two compared runs: accent, then violet.
-const COMPARE_COLORS = ['var(--accent)', 'var(--violet)']
+// COMPARE_COLORS mark the two compared runs: chart-1 (blue), then chart-2 (teal).
+const COMPARE_COLORS = ['var(--accent)', 'var(--chart-2)']
 
 // started is the start time of the table, e.g. 2026-11-03 05:54:10.
 function started(r: TesterHistorySummary): string {

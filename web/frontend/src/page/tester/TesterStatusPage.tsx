@@ -126,7 +126,7 @@ function Overview({ id, status, latencyMs, run, cpuLoad, saved }: {
               <KvRow k="Started" v={run.startedAt ? new Date(run.startedAt).toLocaleString() : '—'} mono />
               <KvRow k="UEs" v={`${run.ues.established.toLocaleString()} established`} mono />
             </>
-          ) : <p className={styles.panelText}>Nothing has run since fru-tester started.</p>}
+          ) : <p className={styles.panelText}>Nothing has run since frunami-tester started.</p>}
           <Link to={`/tester/run/${id}`} className={styles.openLink} style={{ marginLeft: 0, fontSize: '0.8125rem' }}>
             Open this tester&apos;s run
             <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M4 2l4 4-4 4" /></svg>
@@ -156,7 +156,7 @@ function Overview({ id, status, latencyMs, run, cpuLoad, saved }: {
           {m.cgroupLimit != null && m.cgroupUsage != null && (
             <Meter label="Container limit" value={formatBytesPair(m.cgroupUsage, m.cgroupLimit)} ratio={m.cgroupLimit > 0 ? m.cgroupUsage / m.cgroupLimit : 0} />
           )}
-          <KvRow k="fru-tester" v={`${formatBytes(m.processRss)} resident`} mono />
+          <KvRow k="frunami-tester" v={`${formatBytes(m.processRss)} resident`} mono />
           <KvRow k="Container" v={m.cgroupLimit == null ? 'no memory limit' : `limit ${formatBytes(m.cgroupLimit)}`} mono />
         </section>
 
@@ -218,7 +218,7 @@ function TesterPanel({ id, addError, addSuccess, onReach }: {
         })
         .catch((error) => {
           if (cancelled) return
-          setUnreachable(extractErrorMessage(error, 'fru-tester did not answer'))
+          setUnreachable(extractErrorMessage(error, 'frunami-tester did not answer'))
           wasDown = true
         })
       api.testerByIdRun(id, 0, 0)
@@ -310,12 +310,12 @@ function TesterPanel({ id, addError, addSuccess, onReach }: {
           </div>
           <p className={styles.runError}>{unreachable}</p>
           <p className={styles.panelText}>
-            Check that fru-tester is running at that URL and that its <code>apiToken</code> is the one fru-lab sends. This page keeps trying every few seconds.
+            Check that frunami-tester is running at that URL and that its <code>apiToken</code> is the one FRUNAMI sends. This page keeps trying every few seconds.
           </p>
         </section>
       )}
 
-      {!unreachable && !status && <p className={styles.emptyState}>Connecting to fru-tester…</p>}
+      {!unreachable && !status && <p className={styles.emptyState}>Connecting to frunami-tester…</p>}
 
       {status && !unreachable && (
         <Overview id={id} status={status} latencyMs={latencyMs} run={run} cpuLoad={cpuLoad} saved={saved} />
@@ -358,10 +358,10 @@ function TesterPanel({ id, addError, addSuccess, onReach }: {
             </div>
             <CpuMap info={info} cp={cp ?? []} dp={dp ?? []} irq={irq} onToggle={toggle} disabled={runActive} />
             <p className={styles.hint}>
-              Click a CPU to move it: not pinned → control plane → data plane. fru-tester may use CPUs {info.topology.allowed || '—'} of {info.topology.online || '—'}.
-              {' '}<b>Control plane</b>: N2, registration, PDU sessions, the control-plane loop and fru-tester&apos;s API run only on these CPUs during a run.
+              Click a CPU to move it: not pinned → control plane → data plane. frunami-tester may use CPUs {info.topology.allowed || '—'} of {info.topology.online || '—'}.
+              {' '}<b>Control plane</b>: N2, registration, PDU sessions, the control-plane loop and frunami-tester&apos;s API run only on these CPUs during a run.
               {' '}<b>Data plane</b>: every sender and reader keeps its own thread on these CPUs. With N CPUs and G gNBs the socket engine runs G×⌈N/G⌉ uplink senders, N uplink readers (N6 sink), N downlink senders and G downlink readers (one per gNB); AF_XDP runs one reader per NIC queue and up to N senders per NIC. Leave a list empty to not pin that side.
-              {' '}The kernel&apos;s share of receiving runs where the NIC&apos;s interrupts go, which fru-tester does not move: set that on the host so they land on the data plane CPUs.
+              {' '}The kernel&apos;s share of receiving runs where the NIC&apos;s interrupts go, which frunami-tester does not move: set that on the host so they land on the data plane CPUs.
             </p>
           </section>
 
@@ -373,7 +373,7 @@ function TesterPanel({ id, addError, addSuccess, onReach }: {
             <CpuUsage info={info} load={busy} cp={parseCpus(saved.cpCpus) ?? []} dp={parseCpus(saved.dpCpus) ?? []} />
             <div className={styles.usageScale}><span>0%</span><i /><span>100%</span></div>
             <p className={styles.hint}>
-              How busy each CPU of the host is, during a run too. Every process and the kernel&apos;s interrupt work count, not only fru-tester.
+              How busy each CPU of the host is, during a run too. Every process and the kernel&apos;s interrupt work count, not only frunami-tester.
               {' '}CP and DP mark the saved allocation.
             </p>
           </section>
@@ -419,7 +419,7 @@ interface FleetEntry {
   busy: number | null
   system?: TesterSystemInfo
   lastSeen: number | null
-  // round trip of the last status read, through fru-lab
+  // round trip of the last status read, through FRUNAMI
   latencyMs: number | null
 }
 
@@ -454,7 +454,7 @@ function useFleet(testers: TesterEntry[] | null): Record<string, FleetEntry> {
           .catch((error) => {
             if (cancelled) return
             reached.delete(t.id)
-            set(t.id, (e) => ({ ...e, down: extractErrorMessage(error, 'fru-tester did not answer') }))
+            set(t.id, (e) => ({ ...e, down: extractErrorMessage(error, 'frunami-tester did not answer') }))
           })
         api.testerByIdRun(t.id, 0, 0)
           .then((r) => { if (!cancelled) set(t.id, (e) => ({ ...e, run: r.data })) })
@@ -523,7 +523,7 @@ function FleetRow({ tester, entry, onRemove }: { tester: TesterEntry, entry: Fle
       <tr className={down ? fleet.hasErr : undefined}>
         <td>
           <Link to={`/tester/status/${tester.id}`} className={fleet.name}>{name}</Link>
-          {tester.builtIn && <span className={`${fleet.tag} ${fleet.tagSm}`} title="From config.yaml · runs next to fru-lab">Default</span>}
+          {tester.builtIn && <span className={`${fleet.tag} ${fleet.tagSm}`} title="From config.yaml · runs next to FRUNAMI">Default</span>}
         </td>
         <td className={`${fleet.mono} ${fleet.dim}`}>{tester.url}</td>
         <td>{tag}</td>
@@ -562,7 +562,7 @@ function FleetRow({ tester, entry, onRemove }: { tester: TesterEntry, entry: Fle
   )
 }
 
-// AddTesterForm adds a tester by its URL and API token; fru-lab checks
+// AddTesterForm adds a tester by its URL and API token; FRUNAMI checks
 // that it answers before keeping it.
 function AddTesterForm({ onAdded, onCancel }: { onAdded: (name: string) => void, onCancel: () => void }) {
   const [url, setUrl] = useState('http://')
@@ -586,14 +586,14 @@ function AddTesterForm({ onAdded, onCancel }: { onAdded: (name: string) => void,
 
   return (
     <section className={fleet.panel} aria-label="Add a tester">
-      <div className={fleet.ph}><h2>Add a tester</h2><span className={fleet.aux}>fru-lab checks it answers before saving</span></div>
+      <div className={fleet.ph}><h2>Add a tester</h2><span className={fleet.aux}>FRUNAMI checks it answers before saving</span></div>
       <form onSubmit={handleAdd}>
         <div className={fleet.fgrid}>
           <div className={fleet.fld}>
             <label htmlFor="testerUrl">URL</label>
             <input id="testerUrl" className={fleet.inp} type="text" placeholder="http://10.0.0.2:9100" autoFocus
               value={url} onChange={(e) => setUrl(e.target.value)} />
-            <p className={fleet.hint}>Where fru-lab reaches it: its listen address in tester.yaml.</p>
+            <p className={fleet.hint}>Where FRUNAMI reaches it: its listen address in tester.yaml.</p>
           </div>
           <div className={fleet.fld}>
             <label htmlFor="testerToken">API token</label>
@@ -606,7 +606,7 @@ function AddTesterForm({ onAdded, onCancel }: { onAdded: (name: string) => void,
         <div className={fleet.pf}>
           <button type="submit" className={`${fleet.btn} ${fleet.btnP}`} disabled={isAdding || url.trim() === '' || token.trim() === ''}>{isAdding ? 'Checking…' : 'Add'}</button>
           <button type="button" className={fleet.btn} onClick={onCancel} disabled={isAdding}>Cancel</button>
-          <span className={fleet.hint}>fru-lab asks the tester for its status first and adds it only if it answers. Its name is the testerName in its tester.yaml.</span>
+          <span className={fleet.hint}>FRUNAMI asks the tester for its status first and adds it only if it answers. Its name is the testerName in its tester.yaml.</span>
         </div>
       </form>
     </section>
@@ -633,7 +633,7 @@ export default function TesterStatusPage() {
   useEffect(() => { load() }, [load])
 
   async function handleRemove(t: TesterEntry, name: string) {
-    if (!window.confirm(`Remove ${name} (${t.url}) from fru-lab? The tester itself keeps running.`)) return
+    if (!window.confirm(`Remove ${name} (${t.url}) from FRUNAMI? The tester itself keeps running.`)) return
     try {
       await api.testersDelete(t.id)
       addSuccess(`Removed ${name}`)
@@ -659,7 +659,7 @@ export default function TesterStatusPage() {
       overlay={<NotificationContainer errors={errors} successes={successes} onClose={removeNotification} />}>
       <section className={fleet.head}>
         <h1 className={fleet.title}>Testers</h1>
-        <span className={fleet.sub}>Every fru-tester this console drives. Click a name for its CPU isolation, interfaces and current run.</span>
+        <span className={fleet.sub}>Every frunami-tester this console drives. Click a name for its CPU isolation, interfaces and current run.</span>
         <div className={fleet.headActions}>
           <button type="button" className={`${fleet.btn} ${fleet.btnP}`} onClick={() => setAdding(true)} disabled={adding}><PlusIcon />Add tester</button>
         </div>
@@ -726,7 +726,7 @@ export function TesterDetailPage() {
         <div className={styles.pageHeadText}>
           <div className={styles.titleRow}>
             <h1 className={styles.pageTitle}>{name}</h1>
-            {entry?.builtIn && <span className={styles.defaultTag} title="From config.yaml · runs next to fru-lab">DEFAULT</span>}
+            {entry?.builtIn && <span className={styles.defaultTag} title="From config.yaml · runs next to FRUNAMI">DEFAULT</span>}
             {reach.unreachable
               ? <span className={`${styles.state} ${styles.stateLg} ${styles.stateBad}`}>Unreachable</span>
               : reach.status

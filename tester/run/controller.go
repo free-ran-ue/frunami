@@ -76,7 +76,7 @@ const dataplaneDrain = 200 * time.Millisecond
 // before that is dropped (seen as start-up loss against free5GC).
 const trafficStartDelay = 500 * time.Millisecond
 
-// keptReports is how many finished runs Reports returns. fru-lab polls
+// keptReports is how many finished runs Reports returns. frunami polls
 // every few seconds; keeping several means a run that was followed at
 // once by the next is still picked up.
 const keptReports = 10
@@ -295,7 +295,7 @@ func (c *Controller) SnapshotPage(q GnbPage) Snapshot {
 }
 
 // Reports returns the last keptReports finished (stopped or failed)
-// runs, oldest first, for fru-lab's history.
+// runs, oldest first, for frunami's history.
 func (c *Controller) Reports() []Report {
 	c.mu.Lock()
 	runs := append([]*run{}, c.past...)

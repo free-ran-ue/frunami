@@ -9,10 +9,10 @@ import (
 	"github.com/vishvananda/netlink"
 )
 
-// Needs root: sudo FRU_TESTER_NETLINK=1 go test ./netcfg/
+// Needs root: sudo FRUNAMI_TESTER_NETLINK=1 go test ./netcfg/
 func TestNetlinkAddRemoveOnDummyLink(t *testing.T) {
-	if os.Getenv("FRU_TESTER_NETLINK") != "1" {
-		t.Skip("set FRU_TESTER_NETLINK=1 and run as root to exercise netlink")
+	if os.Getenv("FRUNAMI_TESTER_NETLINK") != "1" {
+		t.Skip("set FRUNAMI_TESTER_NETLINK=1 and run as root to exercise netlink")
 	}
 	link := &netlink.Dummy{LinkAttrs: netlink.LinkAttrs{Name: "frutest0"}}
 	require.NoError(t, netlink.LinkAdd(link))
