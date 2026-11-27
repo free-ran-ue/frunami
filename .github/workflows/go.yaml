@@ -1,0 +1,37 @@
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: [ '1.26.11' ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Build
+        run: cd web/backend && go build -v ./...
+
+      - name: Test
+        run: cd web/backend && go test -v ./...
+
+      - name: Build fru-tester
+        run: cd tester && go build -v ./...
+
+      # tests that need root or the sctp kernel module are skipped unless
+      # FRU_TESTER_NETLINK / FRU_TESTER_SCTP are set
+      - name: Test fru-tester
+        run: cd tester && go test -race -v ./...
+
+      - name: Make Backend
+        run: make
